@@ -1295,7 +1295,7 @@ function graphicsmagick_effects_swirl(object $image, array $data): bool {
  *   the default value.
  */
 function graphicsmagick_toolkit_get_jpeg_quality(): int {
-  $value = config_get('graphicsmagick_toolkit_jpeg_quality');
+  $value = config_get('system.core', 'graphicsmagick_toolkit_jpeg_quality');
 
   // If the JPEG quality value hasn't been set, return 80 instead of 0, which
   // would be a bad image quality to use by default.
@@ -1310,7 +1310,7 @@ function graphicsmagick_toolkit_get_jpeg_quality(): int {
  *   the default value.
  */
 function graphicsmagick_toolkit_get_png_compression(): int {
-  $value = config_get('graphicsmagick_toolkit_png_compression');
+  $value = config_get('system_core', 'graphicsmagick_toolkit_png_compression');
 
   // If the PNG compression value hasn't been set, return 99 instead of 0, which
   // is a better compression value to use by default.
