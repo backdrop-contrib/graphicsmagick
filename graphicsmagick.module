@@ -12,8 +12,8 @@ use graphicsmagick\Utility\Color;
  */
 function graphicsmagick_autoload_info(): array {
   return array(
-    'graphicsmagick\Attribute\DefaultSetting' => 'includes/default.setting.class.inc',
-    'graphicsmagick\ToolkitSettings' => 'includes/toolkit.settings.class.inc',
+    'graphicsmagick\Attribute\DefaultSetting' => 'includes/default_setting.class.inc',
+    'graphicsmagick\ToolkitSettings' => 'includes/toolkit_settings.class.inc',
     'graphicsmagick\Utility\Color' => 'includes/color.class.inc',
   );
 }
