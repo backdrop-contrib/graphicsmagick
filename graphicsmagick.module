@@ -4,6 +4,7 @@ g<?php
  * Hooks implementations for the GraphicsMagick module.
  */
 
+use graphicsmagick\ToolkitSettings;
 use graphicsmagick\Utility\Color;
 
  /**
@@ -11,6 +12,8 @@ use graphicsmagick\Utility\Color;
  */
 function graphicsmagick_autoload_info(): array {
   return array(
+    'graphicsmagick\Attribute\DefaultSetting' => 'includes/default.setting.class.inc',
+    'graphicsmagick\ToolkitSettings' => 'includes/toolkit.settings.class.inc',
     'graphicsmagick\Utility\Color' => 'includes/color.class.inc',
   );
 }
@@ -178,27 +181,9 @@ function graphicsmagick_theme(): array {
  *   The form array.
  */
 function image_graphicsmagick_toolkit_settings(): array {
-  $form['graphicsmagick_toolkit_jpeg_quality'] = array(
-    '#type' => 'number',
-    '#title' => t('JPEG quality'),
-    '#description' => t('The image quality for JPEG images (from 0 to 100). Higher values mean better image quality but bigger files.'),
-    '#default_value' => graphicsmagick_toolkit_get_jpeg_quality(),
-    '#min' => 0,
-    '#max' => 100,
-    '#step' => 1,
-  );
+  $settings = new ToolkitSettings();
 
-  $form['graphicsmagick_toolkit_png_compression'] = array(
-    '#type' => 'number',
-    '#title' => t('PNG compression'),
-    '#description' => t('The PNG compression (from 0 to 99). Higher values do not mean better compression, although 99 usually compresses a PNG image more than other values. Verify the file size once the image has been saved.'),
-    '#default_value' => graphicsmagick_toolkit_get_png_compression(),
-    '#min' => 0,
-    '#max' => 100,
-    '#step' => 1,
-  );
-
-  return $form;
+  return $settings->settingsForm([]);
 }
 
 /**
@@ -1288,36 +1273,6 @@ function graphicsmagick_effects_swirl(object $image, array $data): bool {
 }
 
 /**
- * Returns the image quality to use with JPEG images.
- *
- * @return int
- *   The image quality for JPEG images, a value between 0 and 100, where 95 is
- *   the default value.
- */
-function graphicsmagick_toolkit_get_jpeg_quality(): int {
-  $value = config_get('system.core', 'graphicsmagick_toolkit_jpeg_quality');
-
-  // If the JPEG quality value hasn't been set, return 80 instead of 0, which
-  // would be a bad image quality to use by default.
-  return $value ?? 80;
-}
-
-/**
- * Returns the compression value to use with PNG images.
- *
- * @return int
- *   The compression value for PNG images, a value between 0 and 99, where 99 is
- *   the default value.
- */
-function graphicsmagick_toolkit_get_png_compression(): int {
-  $value = config_get('system_core', 'graphicsmagick_toolkit_png_compression');
-
-  // If the PNG compression value hasn't been set, return 99 instead of 0, which
-  // is a better compression value to use by default.
-  return $value ?? 99;
-}
-
-/**
  * Verifies the methods used from the GraphicsMagick toolkit can be used.
  *
  * This function could be used from the modules that need to use the Gmagick
@@ -1745,6 +1700,8 @@ function graphicsmagick_image_effect(object $image, callable $effect, ...$data):
  *   value has not been set, and it is not possible to load the source image.
  */
 function graphicsmagick_image_save(object $image, string $destination): bool {
+  $settings = new ToolkitSettings();
+
   if (isset($image->handler) && !is_a($image->handler, 'Gmagick')) {
     // $image->handler has been already set, but it is not a Gmagick instance.
     // To avoid conflicts with other modules, avoid to save the image and return
@@ -1766,11 +1723,11 @@ function graphicsmagick_image_save(object $image, string $destination): bool {
   try {
     switch ($image->mimeType) {
       case 'image/jpeg':
-        $image->handler->setCompressionQuality(graphicsmagick_toolkit_get_jpeg_quality());
+        $image->handler->setCompressionQuality($settings->get('graphicsmagick_toolkit_jpeg_quality'));
         break;
 
       case 'image/png';
-        $image->handler->setCompressionQuality(graphicsmagick_toolkit_get_png_compression());
+        $image->handler->setCompressionQuality($settings->get('graphicsmagick_toolkit_png_quality'));
         break;
     }
 
