@@ -4,6 +4,7 @@ g<?php
  * Hooks implementations for the GraphicsMagick module.
  */
 
+use graphicsmagick\ToolkitInfo;
 use graphicsmagick\ToolkitSettings;
 use graphicsmagick\Utility\Color;
 
@@ -144,10 +145,20 @@ function graphicsmagick_image_effect_info(): array {
  * Implements hook_image_toolkits().
  */
 function graphicsmagick_image_toolkits(): array {
+  try {
+    $toolkit_info = new ToolkitInfo();
+    $available = $toolkit_info->isAvailable();
+  }
+  catch (\RuntimeException $e) {
+    watchdog_exception('graphicsmagick', $e);
+
+    $available = FALSE;
+  }
+
   return array(
     'graphicsmagick_toolkit' => array(
       'title' => t('GraphicsMagick toolkit'),
-      'available' => graphicsmagick_available(),
+      'available' => $available,
     ),
   );
 }
@@ -193,69 +204,16 @@ function image_graphicsmagick_toolkit_settings(): array {
  *   The supported extensions.
  */
 function image_graphicsmagick_toolkit_supported_extensions(): array {
-  // The following list doesn't include all the file types recognized by the
-  // GraphicsMagick library; it includes most of the image types, excluding
-  // the raw images and those images the Gmagick class is not able to write.
-  $extensions = array(
-    'BMP' => 'bmp',
-    'CIN' => 'cin',
-    'DCX' => 'dcx',
-    'DPX' => 'dpx',
-    'EPI' => 'epi',
-    'EPSF' => 'eps',
-    'EPSI' => 'eps',
-    'EPT' => 'eps',
-    'EPT2' => 'eps',
-    'EPT3' => 'eps',
-    'EPS' => 'eps',
-    'FITS' => 'fits',
-    'GIF87' => 'gif',
-    'GIF' => 'gif',
-    'ICB' => 'icb',
-    'JPEG' => 'jpeg',
-    'JPG' => 'jpg',
-    'PAM' => 'pam',
-    'PBM' => 'pbm',
-    'EPDF' => 'pdf',
-    'PDF' => 'pdf',
-    'PGM' => 'pgm',
-    'PNG00' => 'png',
-    'PNG24' => 'png',
-    'PNG32' => 'png',
-    'PNG48' => 'png',
-    'PNG' => 'png',
-    'PNM' => 'pnm',
-    'PPM' => 'ppm',
-    'PS' => 'ps',
-    'SGI' => 'sgi',
-    'TGA' => 'tga',
-    'PTIF' => 'tif',
-    'BIGTIFF' => 'tif',
-    'TIFF' => 'tiff',
-    'VDA' => 'vda',
-    'VST' => 'vst',
-    'WBMP' => 'wbmp',
-    'WEBP' => 'webp',
-    'XBM' => 'xbm',
-    'PICON' => 'xpm',
-  );
-  $supported_extensions = array();
-
   try {
-    $handler = new Gmagick();
+    $toolkit_info = new ToolkitInfo();
 
-    foreach ($handler->queryFormats() as $format) {
-      if (isset($extensions[$format])) {
-        $supported_extensions[] = $extensions[$format];
-      }
-    }
+    return $toolkit_info->supportedExtensions();
   }
-  catch (GmagickException) {
-    // Ignore the thrown exception.
-  }
+  catch (\RuntimeException $e) {
+    watchdog_exception('graphicsmagick', $e);
 
-  // The returned extensions exclude raw images.
-  return array_unique($supported_extensions);
+    return array();
+  }
 }
 
 /**
@@ -1062,12 +1020,13 @@ function graphicsmagick_effects_gamma(object $image, array $data): bool {
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_noise_form(array $data): array {
+
   $form['noise'] = array(
     '#type' => 'select',
     '#title' => t('Noise type'),
     '#description' => t('The noise type changes for which pixels the color is randomly changed.'),
-    '#options' => graphicsmagick_image_noise_options(),
-    '#default_value' => $data['noise'] ?? Gmagick::NOISE_UNIFORM,
+    '#options' => ToolkitInfo::noiseOptions(),
+    '#default_value' => $data['noise'] ?? 'uniform',
     '#required' => TRUE,
   );
 
@@ -1088,6 +1047,10 @@ function graphicsmagick_effects_noise_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_noise(object $image, array $data): bool {
+  if (isset($data['noise'])) {
+    $data['noise'] = ToolkitInfo::noiseOptionToValue($data['noise']);
+  }
+
   return image_toolkit_invoke('noise', $image, array_values($data));
 }
 
@@ -1146,10 +1109,10 @@ function graphicsmagick_effects_oil_paint(object $image, array $data): bool {
  */
 function graphicsmagick_effects_solarize_form(array $data): array {
   try {
-    $gmagick = new Gmagick();
-    $quantum_level = $gmagick->getQuantumDepth()['quantumDepthLong'];
+    $toolkit_info = new ToolkitInfo();
+    $quantum_level = $toolkit_info->getQuantumLevel();
   }
-  catch (Exception) {
+  catch (RuntimeException) {
     // As getting the quantum dept value failed, assume its value is 8.
     $quantum_level = 8;
   }
@@ -1273,39 +1236,6 @@ function graphicsmagick_effects_swirl(object $image, array $data): bool {
 }
 
 /**
- * Verifies the methods used from the GraphicsMagick toolkit can be used.
- *
- * This function could be used from the modules that need to use the Gmagick
- * extension to alter images, as the methods this function checks are necessary
- * to handle animated images.
- *
- * @return bool
- *   TRUE when the Gmagick PHP extension is loaded, the Gmagick class it
- *   implements is available, and that class implements the methods used by the
- *   toolkit.
- */
-function graphicsmagick_available(): bool {
-  if (extension_loaded('gmagick') && class_exists('Gmagick')) {
-    try {
-      $handler = new Gmagick();
-
-      // Verify the undocumented methods used by the toolkit are implemented.
-      $missing_methods = FALSE;
-      $missing_methods |= !method_exists($handler, 'getNumberImages');
-      $missing_methods |= !method_exists($handler, 'coalesceImages');
-      $missing_methods |= !method_exists($handler, 'deconstructImages');
-
-      return !$missing_methods;
-    }
-    catch (\GmagickException) {
-      return FALSE;
-    }
-  }
-
-  return FALSE;
-}
-
-/**
  * Loads an image from a file.
  *
  * This function can be used from any module that needs to use the effects
@@ -1363,245 +1293,21 @@ function graphicsmagick_image_load(object $image): bool {
     return FALSE;
   }
 
+
   $image->handler = $handler;
   $image->format = $format;
-  $image->mimeType = graphicsmagick_image_format_to_mime_type($format);
+
+  try {
+    $toolkit_info = new ToolkitInfo();
+    $image->mimeType = $toolkit_info->mimeTypeFromFormat($format);
+  }
+  catch (\RuntimeException $e) {
+    watchdog_exception('graphicsmagick', $e);
+
+    return FALSE;
+  }
 
   return TRUE;
-}
-
-/**
- * Retrieves the image format as defined by the Gmagick class.
- *
- * @param object $image
- *   The image object.
- *
- * @return false|string
- *   FALSE in case of error, or a string containing one of the format recognized
- *   by the Gmagick class.
- */
-function graphicsmagick_image_format(object $image): false|string {
-  if (isset($image->handler) && !is_a($image->handler, 'Gmagick')) {
-    // $image->handler has been already set, but it is not a Gmagick instance.
-    // To avoid conflicts with other modules, avoid to load the image and return
-    // FALSE.
-    return FALSE;
-  }
-
-  if (!isset($image->handler)) {
-    if (!graphicsmagick_image_load($image)) {
-      // The file does not contain an image, it does not contain an image
-      // recognized from the Gmagick class, the file is corrupted, or creating a
-      // Gmagick instance was not possible for other reasons. Return FALSE.
-      return FALSE;
-    }
-  }
-
-  // Return the $image->format value previously set only when $image->handler is
-  // a Gmagick instance.
-  if (isset($image->format)) {
-    return $image->format;
-  }
-
-  try {
-    $format = $image->handler->getImageFormat();
-  } catch (GmagickException) {
-    // If Gmagick::getImageFormat() returned an exception, report a failure to
-    // the calling function. An exception in this case could mean the file
-    // does not contain an image, it does not contain an image recognized from
-    // the Gmagick class, or the file is corrupted.
-    return FALSE;
-  }
-
-  $image->format = $format;
-
-  return $format;
-}
-
-/**
- * Returns the option array for noise types implemented by the Gmagick class.
- *
- * @return array
- *   An array whose keys are the Gmagick::NOISE_* constants and the values are
- *   the noise names to shown in forms.
- */
-function graphicsmagick_image_noise_options(): array {
-  return array(
-    Gmagick::NOISE_UNIFORM => t('Uniform'),
-    Gmagick::NOISE_GAUSSIAN => t('Gaussian'),
-    Gmagick::NOISE_MULTIPLICATIVEGAUSSIAN => t('Multiplicative Gaussian'),
-    Gmagick::NOISE_LAPLACIAN => t('Laplacian'),
-    Gmagick::NOISE_POISSON => t('Poisson'),
-  );
-}
-
-/**
- * Converts the format returned by the Gmagick class in the image extension.
- *
- * Modules can get the image format required from this function using
- * graphicsmagick_image_format(), without accessing any method implemented by
- * the Gmagick class.
- *
- * @param string $format
- *   The image format returned from the Gmagick class.
- *
- * @return string
- *   The image extension used by default for that image format.
- *
- * @see graphicsmagick_image_format()
- */
-function graphicsmagick_image_format_to_extension(string $format): string {
-  // The following list doesn't include all the file types recognized by the
-  // GraphicsMagick library; it includes most of the image types, excluding
-  // the raw images and those images the Gmagick class is not able to write.
-  $extensions = array(
-    'BMP' => 'bmp',
-    'CIN' => 'cin',
-    'DCX' => 'dcx',
-    'DPX' => 'dpx',
-    'EPI' => 'epi',
-    'EPSF' => 'eps',
-    'EPSI' => 'eps',
-    'EPT' => 'eps',
-    'EPT2' => 'eps',
-    'EPT3' => 'eps',
-    'EPS' => 'eps',
-    'FITS' => 'fits',
-    'GIF87' => 'gif',
-    'GIF' => 'gif',
-    'ICB' => 'icb',
-    'JPEG' => 'jpeg',
-    'JPG' => 'jpg',
-    'PAM' => 'pam',
-    'PBM' => 'pbm',
-    'EPDF' => 'pdf',
-    'PDF' => 'pdf',
-    'PGM' => 'pgm',
-    'PNG00' => 'png',
-    'PNG24' => 'png',
-    'PNG32' => 'png',
-    'PNG48' => 'png',
-    'PNG' => 'png',
-    'PNM' => 'pnm',
-    'PPM' => 'ppm',
-    'PS' => 'ps',
-    'SGI' => 'sgi',
-    'TGA' => 'tga',
-    'PTIF' => 'tif',
-    'BIGTIFF' => 'tif',
-    'TIFF' => 'tiff',
-    'VDA' => 'vda',
-    'VST' => 'vst',
-    'WBMP' => 'wbmp',
-    'WEBP' => 'webp',
-    'XBM' => 'xbm',
-    'PICON' => 'xpm',
-  );
-
-  try {
-    $handler = new Gmagick();
-    $supported_formats = $handler->queryFormats();
-  }
-  catch (GmagickException) {
-    // Return an empty string to signal an error.
-    return '';
-  }
-
-  if (in_array($format, $supported_formats) && isset($extensions[$format])) {
-    return $extensions[$format];
-  }
-  else {
-    // If a format is not in $extensions, return an empty string, since
-    // Gmagick::queryFormats() returns also video formats and raw image formats.
-    return '';
-  }
-}
-
-/**
- * Converts the format returned by the Gmagick class in the image MIME type.
- *
- * Modules can get the image format required from this function using
- * graphicsmagick_image_format(), without accessing any method implemented by
- * the Gmagick class.
- *
- * @param string $format
- *   The image format returned from the Gmagick class.
- *
- * @return string
- *   The image MIME type.
- *
- * @see graphicsmagick_image_format()
- */
-function graphicsmagick_image_format_to_mime_type(string $format): string {
-  // Since the Gmagick class doesn't provide a method to obtain an image MIME
-  // type, differently from the Imagick class, this code maps the Gmagick
-  // format to the MIME type using a literal array. There is no need to use
-  // mime_content_type() nor finfo_open()/finfo_file(), since the Gmagick
-  // class already recognized the file type.
-  // The following list doesn't include all the file types recognized by the
-  // GraphicsMagick library; it includes most of the image types, excluding
-  // the raw images and those images the Gmagick class is not able to write.
-  $mime_types = array(
-    'BIGTIFF' => 'image/tiff',
-    'BMP' => 'image/x-ms-bmp',
-    'CIN' => 'image/cineon',
-    'DCX' => 'image/x-pc-paintbrush',
-    'DPX' => 'image/x-dpx',
-    'EPDF' => 'application/pdf',
-    'EPI' => 'application/postscript',
-    'EPS' => 'application/postscript',
-    'EPSF' => 'application/postscript',
-    'EPSI' => 'application/postscript',
-    'EPT' => 'image/eps',
-    'EPT2' => 'image/eps',
-    'EPT3' => 'image/eps',
-    'FITS' => 'image/fits',
-    'GIF' => 'image/gif',
-    'GIF87' => 'image/gif',
-    'ICB' => 'image/x-tga',
-    'JPEG' => 'image/jpeg',
-    'JPG' => 'image/jpeg',
-    'PAM' => 'image/x-portable-pixmap',
-    'PBM' => 'image/x-portable-pixmap',
-    'PDF' => 'application/pdf',
-    'PGM' => 'image/x-portable-greymap',
-    'PICON' => 'image/x-xpmi',
-    'PNG' => 'image/png',
-    'PNG00' => 'image/png',
-    'PNG24' => 'image/png',
-    'PNG32' => 'image/png',
-    'PNG48' => 'image/png',
-    'PNM' => 'image/x-portable-pixmap',
-    'PPM' => 'image/x-portable-pixmap',
-    'PS' => 'application/postscript',
-    'PTIF' => 'image/tiff',
-    'SGI' => 'imagine/sgi',
-    'TGA' => 'image/x-tga',
-    'TIFF' => 'image/tiff',
-    'VDA' => 'image/x-tga',
-    'VST' => 'image/x-tga',
-    'WBMP' => 'image/vnd.wap.wbmp',
-    'WEBP' => 'image/webp',
-    'XBM' => 'image/x‑xbitmap',
-  );
-
-  try {
-    $handler = new Gmagick();
-    $supported_formats = $handler->queryFormats();
-  }
-  catch (GmagickException) {
-    // Return an empty string to signal an error.
-    return '';
-  }
-
-  if (in_array($format, $supported_formats) && isset($mime_types[$format])) {
-    return $mime_types[$format];
-  }
-  else {
-    // If a format is not in $mime_types, return an empty string, since
-    // Gmagick::queryFormats() returns also video formats and raw image formats.
-    return '';
-  }
 }
 
 /**
