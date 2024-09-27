@@ -180,8 +180,8 @@ class ToolkitInfo {
    *   The option for noise generation.
    *
    * @return int
-   *   The value for the noise generation option, or NULL if the option is not
-   *   recognized.
+   *   The value for the noise generation option, or \Gmagick::NOISE_UNIFORM if
+   *   the option is not recognized.
    */
   public static function noiseOptionToValue(string $option): int {
     $options = array(
