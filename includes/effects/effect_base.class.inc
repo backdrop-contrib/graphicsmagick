@@ -44,6 +44,10 @@ class EffectBase implements EffectInterface {
     return $this->defaultSettings;
   }
 
+  public function defaultSettingValue(string $id): mixed {
+    return $this->defaultSettings[$id] ?? NULL;
+  }
+
   public function effectOperations(): array {
     return $this->effectOperations;
   }

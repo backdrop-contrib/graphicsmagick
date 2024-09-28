@@ -8,6 +8,8 @@ interface EffectInterface {
 
   public function defaultSettings(): array;
 
+  public function defaultSettingValue(string $id): mixed;
+
   public function apply(object $image, array $data): bool;
 
   public function settingsForm(): array;
