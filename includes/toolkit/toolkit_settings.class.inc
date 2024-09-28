@@ -1,15 +1,32 @@
 <?php
+/**
+ * @file
+ * Contains \graphicsmagick\ToolkitSettings.
+ */
 
 namespace graphicsmagick;
 
 use graphicsmagick\Attribute\DefaultSetting;
 
+/**
+ * Retrieves information about the toolkit settings.
+ */
 #[DefaultSetting('graphicsmagick_toolkit_png_compression', 99)]
 #[DefaultSetting('graphicsmagick_toolkit_jpeg_quality', 80)]
 class ToolkitSettings {
 
+  /**
+   * An array of default settings.
+   *
+   * @var array
+   */
   protected array $defaultSettings = array();
 
+  /**
+   * The current settings.
+   *
+   * @var array
+   */
   protected array $settings = array();
 
   public function __construct() {
@@ -24,19 +41,56 @@ class ToolkitSettings {
     }
   }
 
-  public function get($key): mixed {
+  /**
+   * Retrieves the value of a setting.
+   *
+   * The value of the setting is first retrieved from the settings array. If
+   * the setting does not exist in the settings array, the value is retrieved
+   * from the default settings array. If the setting does not exist in the
+   * default settings array, the method returns NULL.
+   *
+   * @param string $key
+   *   The ID of the setting to retrieve.
+   *
+   * @return mixed
+   *   The value of the setting, or NULL if the setting does not exist.
+   */
+  public function get(string $key): mixed {
     return $this->settings[$key] ?? ($this->defaultSettings[$key] ?? NULL);
   }
 
-  public function set($key, $value): void {
+  /**
+   * Sets the value of a setting.
+   *
+   * @param string $key
+   *   The ID of the setting to set.
+   * @param mixed $value
+   *   The value to set the setting to.
+   */
+  public function set(string $key, mixed $value): void {
     $this->settings[$key] = $value;
   }
 
-  public function has($key): bool {
+  /**
+   * Determines if a setting exists in the settings array.
+   *
+   * @param string $key
+   *   The ID of the setting to check.
+   *
+   * @return bool
+   *   TRUE if the setting exists, FALSE otherwise.
+   */
+  public function has(string $key): bool {
     return isset($this->settings[$key]);
   }
 
-  public function settingsForm(array $form): array {
+  /**
+   * Returns the form items to configure the toolkit settings.
+   *
+   * @return array
+   *   An associative array of form items.
+   */
+  public function settingsForm(): array {
     $form['graphicsmagick_toolkit_jpeg_quality'] = array(
       '#type' => 'number',
       '#title' => t('JPEG quality'),

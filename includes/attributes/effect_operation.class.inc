@@ -2,6 +2,9 @@
 
 namespace graphicsmagick\Attribute;
 
+/**
+ * Implements the attribute class for the effect operations.
+ */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class EffectOperation {
 

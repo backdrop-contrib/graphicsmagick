@@ -1,7 +1,14 @@
 <?php
+/**
+ * @file
+ * Contains \graphicsmagick\ToolkitInfo.
+ */
 
 namespace graphicsmagick;
 
+/**
+ * Retrieves information about the GraphicsMagick toolkit.
+ */
 class ToolkitInfo {
 
   protected const EXTENSIONS = array(
@@ -92,6 +99,11 @@ class ToolkitInfo {
     'XBM' => 'image/x‑xbitmap',
   );
 
+  /**
+   * An instance of the Gmagick class.
+   *
+   * @var \Gmagick
+   */
   protected \Gmagick $gmagick;
 
   public function __construct() {

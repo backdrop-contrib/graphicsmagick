@@ -195,7 +195,7 @@ function graphicsmagick_theme(): array {
 function image_graphicsmagick_toolkit_settings(): array {
   $settings = new ToolkitSettings();
 
-  return $settings->settingsForm([]);
+  return $settings->settingsForm();
 }
 
 /**
