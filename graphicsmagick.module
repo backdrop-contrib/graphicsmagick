@@ -666,7 +666,7 @@ function image_graphicsmagick_toolkit_gamma(object $image, float $gamma): bool {
 function image_graphicsmagick_toolkit_noise(object $image, int $noise): bool {
   $effect = (new class {
     public function __invoke($handler, $noise) {
-      return $handler->addNoiseImage($noise);
+      return $handler->addNoiseImage(ToolkitInfo::noiseOptionToValue($noise));
     }
   });
 

@@ -194,7 +194,7 @@ class ToolkitInfo implements ToolkitInfoInterface {
       'poisson' => \Gmagick::NOISE_POISSON,
     );
 
-    if (in_array($option, $options)) {
+    if (isset($options[$option])) {
       return $options[$option];
     }
 
