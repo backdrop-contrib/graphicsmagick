@@ -4,6 +4,7 @@
  * Hooks implementations for the GraphicsMagick module.
  */
 
+use graphicsmagick\Effect\EffectBase;
 use graphicsmagick\ToolkitInfo;
 use graphicsmagick\ToolkitSettings;
 use graphicsmagick\Utility\Color;
@@ -769,28 +770,11 @@ function image_graphicsmagick_toolkit_swirl(object $image, float $degrees): bool
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_blur_form(array $data): array {
-  $form['radius'] = array(
-    '#type' => 'number',
-    '#title' => t('Radius'),
-    '#description' => t('This value should typically be either 0, to let the effect choose the best value, or twice the sigma value.'),
-    '#default_value' => $data['radius'] ?? 0.0,
-    '#required' => TRUE,
-    '#min' => 0.0,
-    '#max' => 65355.0,
-    '#step' => 0.5,
-  );
-  $form['sigma'] = array(
-    '#type' => 'number',
-    '#title' => t('Sigma'),
-    '#description' => t('A large sigma value and a smallish radius value will introduce artifacts in the resulting image; small sigma values are typically only used to fuzz lines and smooth edges on images for which no anti-aliasing was used.'),
-    '#default_value' => $data['sigma'] ?? 1.0,
-    '#required' => TRUE,
-    '#min' => 0.0,
-    '#max' => 65355.0,
-    '#step' => 0.5,
-  );
+  if ($effect = EffectBase::create('blur')) {
+    return $effect->settingsForm($data);
+  }
 
-  return $form;
+  return array();
 }
 
 /**
@@ -808,7 +792,11 @@ function graphicsmagick_effects_blur_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_blur(object $image, array $data): bool {
-  return image_toolkit_invoke('blur', $image, array_values($data));
+  if ($effect = EffectBase::create('blur')) {
+    return $effect->apply($image, $data);
+  }
+
+  return FALSE;
 }
 
 /**
@@ -821,7 +809,11 @@ function graphicsmagick_effects_blur(object $image, array $data): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_despeckle(object $image): bool {
-  return image_toolkit_invoke('despeckle', $image);
+  if ($effect = EffectBase::create('despeckle')) {
+    return $effect->apply($image);
+  }
+
+  return FALSE;
 }
 
 /**
@@ -837,18 +829,11 @@ function graphicsmagick_effects_despeckle(object $image): bool {
  *   - "radius": the operation radius.
  */
 function graphicsmagick_effects_edge_form(array $data): array {
-  $form['radius'] = array(
-    '#type' => 'number',
-    '#title' => t('Radius'),
-    '#description' => t('Use a value of zero to let the effect choose the best value.'),
-    '#default_value' => $data['radius'] ?? 0.0,
-    '#required' => TRUE,
-    '#min' => 0.0,
-    '#max' => 65355.0,
-    '#step' => 0.5,
-  );
+  if ($effect = EffectBase::create('edge')) {
+    return $effect->settingsForm($data);
+  }
 
-  return $form;
+  return array();
 }
 
 /**
@@ -865,7 +850,10 @@ function graphicsmagick_effects_edge_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_edge(object $image, array $data): bool {
-  return image_toolkit_invoke('edge', $image, array_values($data));
+  if ($effect = EffectBase::create('edge')) {
+    return $effect->apply($image, $data);
+  }
+  return FALSE;
 }
 
 /**
@@ -879,28 +867,11 @@ function graphicsmagick_effects_edge(object $image, array $data): bool {
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_emboss_form(array $data): array {
-  $form['radius'] = array(
-    '#type' => 'number',
-    '#title' => t('Radius'),
-    '#description' => t('For reasonable results, the radius value should be higher than the sigma value. Use a value of zero to let the effect choose the best value.'),
-    '#default_value' => $data['radius'] ?? 0.0,
-    '#required' => TRUE,
-    '#min' => 0.0,
-    '#max' => 65355.0,
-    '#step' => 0.5,
-  );
-  $form['sigma'] = array(
-    '#type' => 'number',
-    '#title' => t('Sigma'),
-    '#description' => t('A large sigma value works well also with color image. It can remove color dominance, but it could also introduce artifacts, especially in JPEG images.'),
-    '#default_value' => $data['sigma'] ?? 1.0,
-    '#required' => TRUE,
-    '#min' => 0.0,
-    '#max' => 65355.0,
-    '#step' => 0.5,
-  );
+  if ($effect = EffectBase::create('emboss')) {
+    return $effect->settingsForm($data);
+  }
 
-  return $form;
+  return array();
 }
 
 /**
@@ -918,7 +889,11 @@ function graphicsmagick_effects_emboss_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_emboss(object $image, array $data): bool {
-  return image_toolkit_invoke('emboss', $image, array_values($data));
+  if ($effect = EffectBase::create('emboss')) {
+    return $effect->apply($image, $data);
+  }
+
+  return FALSE;
 }
 
 /**
@@ -934,7 +909,11 @@ function graphicsmagick_effects_emboss(object $image, array $data): bool {
  *   TRUE on success, FALSE on failure to blur the image.
  */
 function graphicsmagick_effects_enhance(object $image, array $data): bool {
-  return image_toolkit_invoke('enhance', $image, array_values($data));
+  if ($effect = EffectBase::create('enhance')) {
+    return $effect->apply($image, $data);
+  }
+
+  return FALSE;
 }
 
 /**
@@ -950,7 +929,11 @@ function graphicsmagick_effects_enhance(object $image, array $data): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_equalize(object $image, array $data): bool {
-  return image_toolkit_invoke('equalize', $image, array_values($data));
+  if ($effect = EffectBase::create('equalize')) {
+    return $effect->apply($image, $data);
+  }
+
+  return FALSE;
 }
 
 /**
@@ -966,7 +949,11 @@ function graphicsmagick_effects_equalize(object $image, array $data): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_flip(object $image, array $data): bool {
-  return image_toolkit_invoke('flip', $image, array_values($data));
+  if ($effect = EffectBase::create('flip')) {
+    return $effect->apply($image, $data);
+  }
+
+  return FALSE;
 }
 
 /**
@@ -982,7 +969,11 @@ function graphicsmagick_effects_flip(object $image, array $data): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_flop(object $image, array $data): bool {
-  return image_toolkit_invoke('flop', $image, array_values($data));
+  if ($effect = EffectBase::create('flop')) {
+    return $effect->apply($image, $data);
+  }
+
+  return FALSE;
 }
 
 /**
@@ -996,18 +987,11 @@ function graphicsmagick_effects_flop(object $image, array $data): bool {
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_gamma_form(array $data): array {
-  $form['gamma'] = array(
-    '#type' => 'number',
-    '#title' => t('Gamma'),
-    '#description' => t('Values typically range from 0.8 to 2.3. Values lower than one make the image darker; values higher than one make the image lighter.'),
-    '#default_value' => $data['gamma'] ?? 0.8,
-    '#required' => TRUE,
-    '#min' => 0.0,
-    '#max' => 10.0,
-    '#step' => 0.2,
-  );
+  if ($effect = EffectBase::create('gamma')) {
+    return $effect->settingsForm($data);
+  }
 
-  return $form;
+  return array();
 }
 
 /**
@@ -1024,7 +1008,11 @@ function graphicsmagick_effects_gamma_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_gamma(object $image, array $data): bool {
-  return image_toolkit_invoke('gamma', $image, array_values($data));
+  if ($effect = EffectBase::create('gamma')) {
+    return $effect->apply($image, $data);
+  }
+
+  return FALSE;
 }
 
 /**
@@ -1038,17 +1026,11 @@ function graphicsmagick_effects_gamma(object $image, array $data): bool {
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_noise_form(array $data): array {
+  if ($effect = EffectBase::create('noise')) {
+    return $effect->settingsForm($data);
+  }
 
-  $form['noise'] = array(
-    '#type' => 'select',
-    '#title' => t('Noise type'),
-    '#description' => t('The noise type changes for which pixels the color is randomly changed.'),
-    '#options' => ToolkitInfo::noiseOptions(),
-    '#default_value' => $data['noise'] ?? 'uniform',
-    '#required' => TRUE,
-  );
-
-  return $form;
+  return array();
 }
 
 /**
@@ -1065,11 +1047,11 @@ function graphicsmagick_effects_noise_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_noise(object $image, array $data): bool {
-  if (isset($data['noise'])) {
-    $data['noise'] = ToolkitInfo::noiseOptionToValue($data['noise']);
+  if ($effect = EffectBase::create('noise')) {
+    return $effect->apply($image, $data);
   }
 
-  return image_toolkit_invoke('noise', $image, array_values($data));
+  return FALSE;
 }
 
 /**
@@ -1083,18 +1065,11 @@ function graphicsmagick_effects_noise(object $image, array $data): bool {
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_oil_paint_form(array $data): array {
-  $form['radius'] = array(
-    '#type' => 'number',
-    '#title' => t('Radius'),
-    '#description' => t('Each pixel is replaced by the most frequent color occurring in a circular region defined by the radius value.'),
-    '#default_value' => $data['radius'] ?? 0.8,
-    '#required' => TRUE,
-    '#min' => 0.6,
-    '#max' => 50.0,
-    '#step' => 0.2,
-  );
+  if ($effect = EffectBase::create('oil_paint')) {
+    return $effect->settingsForm($data);
+  }
 
-  return $form;
+  return array();
 }
 
 /**
@@ -1112,7 +1087,11 @@ function graphicsmagick_effects_oil_paint_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_oil_paint(object $image, array $data): bool {
-  return image_toolkit_invoke('oil_paint', $image, array_values($data));
+  if ($effect = EffectBase::create('oil_paint')) {
+    return $effect->apply($image, $data);
+  }
+
+  return FALSE;
 }
 
 /**
@@ -1126,29 +1105,11 @@ function graphicsmagick_effects_oil_paint(object $image, array $data): bool {
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_solarize_form(array $data): array {
-  try {
-    $toolkit_info = new ToolkitInfo();
-    $quantum_level = $toolkit_info->getQuantumLevel();
-  }
-  catch (RuntimeException) {
-    // As getting the quantum dept value failed, assume its value is 8.
-    $quantum_level = 8;
+  if ($effect = EffectBase::create('solarize')) {
+    return $effect->settingsForm($data);
   }
 
-  $level = $data['level'] ?? 1 << (($quantum_level / 2) - 2);
-
-  $form['level'] = array(
-    '#type' => 'number',
-    '#title' => t('Level'),
-    '#description' => t('The effect level.'),
-    '#default_value' => $level,
-    '#required' => TRUE,
-    '#min' => 0,
-    '#max' => 1 << $quantum_level,
-    '#step' => 1,
-  );
-
-  return $form;
+  return array();
 }
 
 /**
@@ -1165,7 +1126,11 @@ function graphicsmagick_effects_solarize_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_solarize(object $image, array $data): bool {
-  return image_toolkit_invoke('solarize', $image, array_values($data));
+  if ($effect = EffectBase::create('solarize')) {
+    return $effect->apply($image, $data);
+  }
+
+  return FALSE;
 }
 
 /**
@@ -1179,18 +1144,11 @@ function graphicsmagick_effects_solarize(object $image, array $data): bool {
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_spread_form(array $data): array {
-  $form['radius'] = array(
-    '#type' => 'number',
-    '#title' => t('Radius'),
-    '#description' => t('Each pixel in a block defined by the radius parameter is randomly displaced.'),
-    '#default_value' => $data['radius'] ?? 2.0,
-    '#required' => TRUE,
-    '#min' => 0.0,
-    '#max' => 50.0,
-    '#step' => 0.4,
-  );
+  if ($effect = EffectBase::create('spread')) {
+    return $effect->settingsForm($data);
+  }
 
-  return $form;
+  return array();
 }
 
 /**
@@ -1208,7 +1166,11 @@ function graphicsmagick_effects_spread_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_spread(object $image, array $data): bool {
-  return image_toolkit_invoke('spread', $image, array_values($data));
+  if ($effect = EffectBase::create('spread')) {
+    return $effect->apply($image, $data);
+  }
+
+  return FALSE;
 }
 
 /**
@@ -1222,18 +1184,11 @@ function graphicsmagick_effects_spread(object $image, array $data): bool {
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_swirl_form(array $data): array {
-  $form['degrees'] = array(
-    '#type' => 'number',
-    '#title' => t('Degrees'),
-    '#description' => t('The sweep of the arc through which each pixel is moved.'),
-    '#default_value' => $data['degrees'] ?? 10.0,
-    '#required' => TRUE,
-    '#min' => 0.0,
-    '#max' => 360.0,
-    '#step' => 2.0,
-  );
+  if ($effect = EffectBase::create('swirl')) {
+    return $effect->settingsForm($data);
+  }
 
-  return $form;
+  return array();
 }
 
 /**
@@ -1250,7 +1205,11 @@ function graphicsmagick_effects_swirl_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_swirl(object $image, array $data): bool {
-  return image_toolkit_invoke('swirl', $image, array_values($data));
+  if ($effect = EffectBase::create('swirl')) {
+    return $effect->apply($image, $data);
+  }
+
+  return FALSE;
 }
 
 /**
