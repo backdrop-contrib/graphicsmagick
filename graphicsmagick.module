@@ -1,4 +1,4 @@
-g<?php
+<?php
 /**
  * @file
  * Hooks implementations for the GraphicsMagick module.
@@ -14,8 +14,25 @@ use graphicsmagick\Utility\Color;
 function graphicsmagick_autoload_info(): array {
   return array(
     'graphicsmagick\Attribute\DefaultSetting' => 'includes/attributes/default_setting.class.inc',
+    'graphicsmagick\Attribute\EffectOperation' => 'includes/attributes/effect_operation.class.inc',
+    'graphicsmagick\Effect\BlurEffect' => 'includes/effects/blur_effect.class.inc',
+    'graphicsmagick\Effect\DespeckleEffect' => 'includes/effects/despeckle_effect.class.inc',
+    'graphicsmagick\Effect\EffectBase' => 'includes/effects/effect_base.class.inc',
+    'graphicsmagick\Effect\EffectInterface' => 'includes/effects/effect_interface.class.inc',
+    'graphicsmagick\Effect\EmbossEffect' => 'includes/effects/emboss_effect.class.inc',
+    'graphicsmagick\Effect\EqualizeEffect' => 'includes/effects/equalize_effect.class.inc',
+    'graphicsmagick\Effect\FlipEffect' => 'includes/effects/flip_effect.class.inc',
+    'graphicsmagick\Effect\FlopEffect' => 'includes/effects/flop_effect.class.inc',
+    'graphicsmagick\Effect\GammaEffect' => 'includes/effects/gamma_effect.class.inc',
+    'graphicsmagick\Effect\NoiseEffect' => 'includes/effects/noise_effect.class.inc',
+    'graphicsmagick\Effect\OilPaintEffect' => 'includes/effects/oil_paint_effect.class.inc',
+    'graphicsmagick\Effect\SolarizeEffect' => 'includes/effects/solarize_effect.class.inc',
+    'graphicsmagick\Effect\SpreadEffect' => 'includes/effects/spread_effect.class.inc',
+    'graphicsmagick\Effect\SwirlEffect' => 'includes/effects/swirl_effect.class.inc',
     'graphicsmagick\ToolkitInfo' => 'includes/toolkit_info.class.inc',
+    'graphicsmagick\ToolkitInfoInterface' => 'includes/toolkit_info_interface.class.inc',
     'graphicsmagick\ToolkitSettings' => 'includes/toolkit_settings.class.inc',
+    'graphicsmagick\ToolkitSettingsInterface' => 'includes/toolkit_settings_interface.class.inc',
     'graphicsmagick\Utility\Color' => 'includes/color.class.inc',
   );
 }
