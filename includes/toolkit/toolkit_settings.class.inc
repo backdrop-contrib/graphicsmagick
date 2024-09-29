@@ -13,7 +13,7 @@ use graphicsmagick\Attribute\DefaultSetting;
  */
 #[DefaultSetting('graphicsmagick_toolkit_png_compression', 99)]
 #[DefaultSetting('graphicsmagick_toolkit_jpeg_quality', 80)]
-class ToolkitSettings {
+class ToolkitSettings implements ToolkitSettingsInterface {
 
   /**
    * An array of default settings.
@@ -42,53 +42,30 @@ class ToolkitSettings {
   }
 
   /**
-   * Retrieves the value of a setting.
-   *
-   * The value of the setting is first retrieved from the settings array. If
-   * the setting does not exist in the settings array, the value is retrieved
-   * from the default settings array. If the setting does not exist in the
-   * default settings array, the method returns NULL.
-   *
-   * @param string $key
-   *   The ID of the setting to retrieve.
-   *
-   * @return mixed
-   *   The value of the setting, or NULL if the setting does not exist.
+   * {@inheritdoc}
    */
   public function get(string $key): mixed {
     return $this->settings[$key] ?? ($this->defaultSettings[$key] ?? NULL);
   }
 
   /**
-   * Sets the value of a setting.
-   *
-   * @param string $key
-   *   The ID of the setting to set.
-   * @param mixed $value
-   *   The value to set the setting to.
+   * {@inheritdoc}
    */
-  public function set(string $key, mixed $value): void {
+  public function set(string $key, mixed $value): self {
     $this->settings[$key] = $value;
+
+    return $this;
   }
 
   /**
-   * Determines if a setting exists in the settings array.
-   *
-   * @param string $key
-   *   The ID of the setting to check.
-   *
-   * @return bool
-   *   TRUE if the setting exists, FALSE otherwise.
+   * {@inheritdoc}
    */
   public function has(string $key): bool {
     return isset($this->settings[$key]);
   }
 
   /**
-   * Returns the form items to configure the toolkit settings.
-   *
-   * @return array
-   *   An associative array of form items.
+   * {@inheritdoc}
    */
   public function settingsForm(): array {
     $form['graphicsmagick_toolkit_jpeg_quality'] = array(

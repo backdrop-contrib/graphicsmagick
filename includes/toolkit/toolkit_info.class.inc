@@ -9,8 +9,13 @@ namespace graphicsmagick;
 /**
  * Retrieves information about the GraphicsMagick toolkit.
  */
-class ToolkitInfo {
+class ToolkitInfo implements ToolkitInfoInterface {
 
+  /**
+   * The supported extensions.
+   *
+   * @var string[]
+   */
   protected const EXTENSIONS = array(
     'BMP' => 'bmp',
     'CIN' => 'cin',
@@ -55,6 +60,11 @@ class ToolkitInfo {
     'PICON' => 'xpm',
   );
 
+  /**
+   * The MIME types for the supported formats.
+   *
+   * @var string[]
+   */
   protected const MIME_TYPES = array(
     'BIGTIFF' => 'image/tiff',
     'BMP' => 'image/x-ms-bmp',
@@ -116,16 +126,7 @@ class ToolkitInfo {
   }
 
   /**
-   * Returns whether the GraphicsMagick toolkit is available.
-   *
-   * The GraphicsMagick toolkit is considered available if the Gmagick class can
-   * be instantiated and the following methods are implemented:
-   * - getNumberImages()
-   * - coalesceImages()
-   * - deconstructImages()
-   *
-   * @return bool
-   *   TRUE if the GraphicsMagick toolkit is available, FALSE otherwise.
+   * {@inheritdoc}
    */
   public function isAvailable(): bool {
     if (isset($this->gmagick)) {
@@ -142,15 +143,7 @@ class ToolkitInfo {
   }
 
   /**
-   * Returns the quantum level for the GraphicsMagick library.
-   *
-   * The quantum level is a value between 8 and 16 that specifies the maximum
-   * number of significant digits for the red, green, and blue intensities that
-   * are used to represent the color of each pixel in an image. The higher the
-   * number, the more detailed the image, but the more memory it needs.
-   *
-   * @return int
-   *   The quantum level.
+   * @inheritdoc}
    */
   public function getQuantumLevel(): int {
     $quantum_level = 8;
@@ -168,11 +161,7 @@ class ToolkitInfo {
   }
 
   /**
-   * Returns the options for noise generation.
-   *
-   * @return array
-   *   An associative array of noise generation options where the keys are the
-   *   option names and the values are the translated names of the options.
+   * @inheritdoc}
    */
   public static function noiseOptions(): array {
     return array(
