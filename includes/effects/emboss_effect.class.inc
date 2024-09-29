@@ -15,8 +15,9 @@ class EmbossEffect extends EffectBase {
 
   /**
    * {@inheritdoc}
+   * @param array $data
    */
-  public function settingsForm(): array {
+  public function settingsForm(array $data): array {
     $form['radius'] = array(
       '#type' => 'number',
       '#title' => t('Radius'),

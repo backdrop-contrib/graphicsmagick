@@ -111,8 +111,9 @@ class EffectBase implements EffectInterface {
 
   /**
    * {@inheritdoc}
+   * @param array $data
    */
-  public function settingsForm(): array {
+  public function settingsForm(array $data): array {
     return array();
   }
 

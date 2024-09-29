@@ -14,8 +14,9 @@ class GammaEffect extends EffectBase {
 
   /**
    * {@inheritdoc}
+   * @param array $data
    */
-  public function settingsForm(): array {
+  public function settingsForm(array $data): array {
     $form['gamma'] = array(
       '#type' => 'number',
       '#title' => t('Gamma'),

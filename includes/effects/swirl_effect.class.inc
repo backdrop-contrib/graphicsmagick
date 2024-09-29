@@ -14,8 +14,9 @@ class SwirlEffect extends EffectBase {
 
   /**
    * {@inheritdoc}
+   * @param array $data
    */
-  public function settingsForm(): array {
+  public function settingsForm(array $data): array {
     $form['degrees'] = array(
       '#type' => 'number',
       '#title' => t('Degrees'),

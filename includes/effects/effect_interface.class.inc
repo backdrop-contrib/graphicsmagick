@@ -58,8 +58,11 @@ interface EffectInterface {
    * form for configuring the effect options. Therefore, it does not need to
    * include metadata about the effect, nor a submit button.
    *
+   * @param array $data
+   *   An associative array of settings.
+   *
    * @return array
    *   An associative array of form items.
    */
-  public function settingsForm(): array;
+  public function settingsForm(array $data): array;
 }

@@ -15,8 +15,9 @@ class NoiseEffect extends EffectBase {
 
   /**
    * {@inheritdoc}
+   * @param array $data
    */
-  public function settingsForm(): array {
+  public function settingsForm(array $data): array {
     $form['noise'] = array(
       '#type' => 'select',
       '#title' => t('Noise type'),

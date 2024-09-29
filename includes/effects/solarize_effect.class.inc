@@ -15,8 +15,9 @@ class SolarizeEffect extends EffectBase {
 
   /**
    * {@inheritdoc}
+   * @param array $data
    */
-  public function settingsForm(): array {
+  public function settingsForm(array $data): array {
     try {
       $toolkit_info = new ToolkitInfo();
       $quantum_level = $toolkit_info->getQuantumLevel();
