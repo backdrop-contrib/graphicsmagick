@@ -90,7 +90,7 @@ class EffectBase implements EffectInterface {
   /**
    * {@inheritdoc}
    */
-  public function apply(object $image, array $data): bool {
+  public function apply(object $image, ?array $data = NULL): bool {
     foreach ($this->effectOperations as $operation => $params) {
       foreach ($params as $key => $value) {
         if (is_string($value) && $value[0] == '$') {
