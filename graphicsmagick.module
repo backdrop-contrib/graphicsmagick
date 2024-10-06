@@ -350,22 +350,6 @@ function image_graphicsmagick_toolkit_resize(object $image, int $width, int $hei
   }
 
   return FALSE;
-
-//  try {
-//    // The following methods could throw an exception. In the case they do, use
-//    // the width and height values passed to the method.
-//    $new_width = $image->handler->getImageWidth();
-//    $new_height = $image->handler->getImageHeight();
-//  }
-//  catch (\GmagickException|\Error) {
-//    $new_width = $width;
-//    $new_height = $height;
-//  }
-//
-//  $image->info['width'] = $new_width;
-//  $image->info['height'] = $new_height;
-//
-//  return $result;
 }
 
 /**
@@ -390,8 +374,8 @@ function image_graphicsmagick_toolkit_rotate(object $image, int $degrees, int|st
   try {
     $color = Color::toHex($background);
 
-    if ($effect = EffectBase::create('rotate')) {
-      return $effect->apply($image, array('degrees' => $degrees, 'background' => $color));
+    if ($operation = OperationBase::create('rotate')) {
+      return $operation->apply($image, array('degrees' => $degrees, 'background' => $color));
     }
   }
   catch (\InvalidArgumentException $e) {
@@ -428,23 +412,6 @@ function image_graphicsmagick_toolkit_crop(object $image, int $x, int $y, int $w
   }
 
   return FALSE;
-
-//  try {
-//    // The following methods could throw an exception. In the case they do, use
-//    // the width and height values passed to the method.
-//    $new_width = $image->handler->getImageWidth();
-//    $new_height = $image->handler->getImageHeight();
-//  }
-//
-//  catch (\GmagickException) {
-//    $new_width = $width;
-//    $new_height = $height;
-//  }
-//
-//  $image->info['width'] = $new_width;
-//  $image->info['height'] = $new_height;
-//
-//  return $result;
 }
 
 /**
