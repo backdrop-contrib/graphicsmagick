@@ -7,6 +7,9 @@ namespace graphicsmagick;
  */
 abstract class MultipleImagesOperationBase extends OperationBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function apply(object $image, ?array $arguments = NULL): bool {
     if (isset($image->handler) && !is_a($image->handler, 'Gmagick')) {
       // $image->handler has been already set, but it is not a Gmagick instance.
