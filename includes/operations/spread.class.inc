@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Contains \graphicsmagick\Operation\Spread.
+ */
 
 namespace graphicsmagick\Operation;
 

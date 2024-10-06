@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Contains \graphicsmagick\Operation\Resize.
+ */
 
 namespace graphicsmagick\Operation;
 

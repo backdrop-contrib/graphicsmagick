@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Contains \graphicsmagick\Operation\OilPaint.
+ */
 
 namespace graphicsmagick\Operation;
 

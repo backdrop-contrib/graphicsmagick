@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Contains \graphicsmagick\Operation\Flop.
+ */
 
 namespace graphicsmagick\Operation;
 

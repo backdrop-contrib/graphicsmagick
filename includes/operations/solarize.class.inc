@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Contains \graphicsmagick\Operation\Solarize.
+ */
 
 namespace graphicsmagick\Operation;
 
