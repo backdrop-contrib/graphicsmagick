@@ -1,6 +1,6 @@
 <?php
 
-namespace graphicsmagick\Operation;
+namespace graphicsmagick;
 
 /**
  * Base class for the GraphicsMagick operations.
@@ -13,7 +13,7 @@ abstract class OperationBase implements OperationInterface {
    * @param string $id
    *   The ID of the operation.
    *
-   * @return \graphicsmagick\Operation\OperationBase|null
+   * @return \graphicsmagick\OperationBase|null
    *   The operation object or NULL if the operation cannot be created.
    */
   public static function create(string $id): ?OperationBase {

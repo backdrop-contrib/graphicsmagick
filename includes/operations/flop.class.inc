@@ -2,6 +2,8 @@
 
 namespace graphicsmagick\Operation;
 
+use graphicsmagick\MultipleImagesOperationBase;
+
 /**
  * Class for the 'flop' GraphicsMagick operation.
  */

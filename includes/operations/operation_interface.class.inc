@@ -1,6 +1,6 @@
 <?php
 
-namespace graphicsmagick\Operation;
+namespace graphicsmagick;
 
 /**
  * Interface for GraphicsMagick toolkit operations.

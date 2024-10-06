@@ -1,6 +1,6 @@
 <?php
 
-namespace graphicsmagick\Operation;
+namespace graphicsmagick;
 
 /**
  * Class for operations that are applied to all the images in a container.

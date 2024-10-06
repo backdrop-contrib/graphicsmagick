@@ -1,6 +1,6 @@
 <?php
 
-namespace graphicsmagick\Operation;
+namespace graphicsmagick;
 
 /**
  * Base class for operations that are applied once to an image.
