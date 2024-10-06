@@ -5,6 +5,7 @@
  */
 
 use graphicsmagick\Effect\EffectBase;
+use graphicsmagick\OperationBase;
 use graphicsmagick\ToolkitInfo;
 use graphicsmagick\ToolkitSettings;
 use graphicsmagick\Utility\Color;
@@ -30,6 +31,28 @@ function graphicsmagick_autoload_info(): array {
     'graphicsmagick\Effect\SolarizeEffect' => 'includes/effects/solarize_effect.class.inc',
     'graphicsmagick\Effect\SpreadEffect' => 'includes/effects/spread_effect.class.inc',
     'graphicsmagick\Effect\SwirlEffect' => 'includes/effects/swirl_effect.class.inc',
+    'graphicsmagick\MultipleImagesOperationBase' => 'includes/operations/multiple_images_operation_base.class.inc',
+    'graphicsmagick\Operation\Blur' => 'includes/operations/blur.class.inc',
+    'graphicsmagick\Operation\Crop' => 'includes/operations/crop.class.inc',
+    'graphicsmagick\Operation\Desaturate' => 'includes/operations/desaturate.class.inc',
+    'graphicsmagick\Operation\Despeckle' => 'includes/operations/despeckle.class.inc',
+    'graphicsmagick\Operation\Edge' => 'includes/operations/edge.class.inc',
+    'graphicsmagick\Operation\Emboss' => 'includes/operations/emboss.class.inc',
+    'graphicsmagick\Operation\Enhance' => 'includes/operations/enhance.class.inc',
+    'graphicsmagick\Operation\Equalize' => 'includes/operations/equalize.class.inc',
+    'graphicsmagick\Operation\Flip' => 'includes/operations/flip.class.inc',
+    'graphicsmagick\Operation\Flop' => 'includes/operations/flop.class.inc',
+    'graphicsmagick\Operation\Gamma' => 'includes/operations/gamma.class.inc',
+    'graphicsmagick\Operation\Noise' => 'includes/operations/noise.class.inc',
+    'graphicsmagick\Operation\OilPaint' => 'includes/operations/oil_paint.class.inc',
+    'graphicsmagick\Operation\Resize' => 'includes/operations/resize.class.inc',
+    'graphicsmagick\Operation\Rotate' => 'includes/operations/rotate.class.inc',
+    'graphicsmagick\Operation\Solarize' => 'includes/operations/solarize.class.inc',
+    'graphicsmagick\Operation\Spread' => 'includes/operations/spread.class.inc',
+    'graphicsmagick\Operation\Swirl' => 'includes/operations/swirl.class.inc',
+    'graphicsmagick\OperationBase' => 'includes/operations/operation_base.class.inc',
+    'graphicsmagick\OperationInterface' => 'includes/operations/operation_interface.class.inc',
+    'graphicsmagick\SingleImageOperationBase' => 'includes/operations/single_image_operation_base.class.inc',
     'graphicsmagick\ToolkitInfo' => 'includes/toolkit_info.class.inc',
     'graphicsmagick\ToolkitInfoInterface' => 'includes/toolkit_info_interface.class.inc',
     'graphicsmagick\ToolkitSettings' => 'includes/toolkit_settings.class.inc',
@@ -322,38 +345,27 @@ function image_graphicsmagick_toolkit_get_info(object $image): false|array {
  * @see image_resize()
  */
 function image_graphicsmagick_toolkit_resize(object $image, int $width, int $height): bool {
-  $effect = (new class {
-    public function __invoke($handler, $width, $height) {
-      // $background, $filter, and $blur are not passed by image_resize() Use
-      // default values for the last three parameters necessary for
-      // Gmagick::resizeImage().
-      return $handler->resizeImage(
-        $width,
-        $height,
-        'transparent',
-        \Gmagick::FILTER_UNDEFINED,
-        0.88
-      );
-    }
-  });
-
-  $result = graphicsmagick_image_effect($image, $effect, $width, $height);
-
-  try {
-    // The following methods could throw an exception. In the case they do, use
-    // the width and height values passed to the method.
-    $new_width = $image->handler->getImageWidth();
-    $new_height = $image->handler->getImageHeight();
-  }
-  catch (\GmagickException|\Error) {
-    $new_width = $width;
-    $new_height = $height;
+  if ($operation = OperationBase::create('resize')) {
+    return $operation->apply($image, array('width' => $width, 'height' => $height));
   }
 
-  $image->info['width'] = $new_width;
-  $image->info['height'] = $new_height;
+  return FALSE;
 
-  return $result;
+//  try {
+//    // The following methods could throw an exception. In the case they do, use
+//    // the width and height values passed to the method.
+//    $new_width = $image->handler->getImageWidth();
+//    $new_height = $image->handler->getImageHeight();
+//  }
+//  catch (\GmagickException|\Error) {
+//    $new_width = $width;
+//    $new_height = $height;
+//  }
+//
+//  $image->info['width'] = $new_width;
+//  $image->info['height'] = $new_height;
+//
+//  return $result;
 }
 
 /**
@@ -377,19 +389,17 @@ function image_graphicsmagick_toolkit_resize(object $image, int $width, int $hei
 function image_graphicsmagick_toolkit_rotate(object $image, int $degrees, int|string|null $background): bool {
   try {
     $color = Color::toHex($background);
+
+    if ($effect = EffectBase::create('rotate')) {
+      return $effect->apply($image, array('degrees' => $degrees, 'background' => $color));
+    }
   }
   catch (\InvalidArgumentException $e) {
     watchdog_exception('graphicsmagick', $e);
     return FALSE;
   }
 
-  $effect = (new class {
-    public function __invoke($handler, $degrees, $background) {
-      return $handler->rotateImage($degrees, $background);
-    }
-  });
-
-  return graphicsmagick_image_effect($image, $effect, $degrees, $color);
+  return FALSE;
 }
 
 /**
@@ -413,39 +423,28 @@ function image_graphicsmagick_toolkit_rotate(object $image, int $degrees, int|st
  * @see image_crop()
  */
 function image_graphicsmagick_toolkit_crop(object $image, int $x, int $y, int $width, int $height): bool {
-  $effect = (new class {
-    public function __invoke($handler, $x, $y, $width, $height) {
-      $handler = $handler->cropImage($width, $height, $x, $y);
-
-      // This method is not documented on
-      // https://www.php.net/manual/en/class.gmagick.php.
-      // Verify it is implemented before using it.
-      if (method_exists($handler, 'setImagePage')) {
-        $handler = $handler->setImagePage($width, $height, $x, $y);
-      }
-
-      return $handler;
-    }
-  });
-
-  $result = graphicsmagick_image_effect($image, $effect, $x, $y, $width, $height);
-
-  try {
-    // The following methods could throw an exception. In the case they do, use
-    // the width and height values passed to the method.
-    $new_width = $image->handler->getImageWidth();
-    $new_height = $image->handler->getImageHeight();
+  if ($operation = OperationBase::create('crop')) {
+    return $operation->apply($image, array('x' => $x, 'y' => $y, 'width' => $width, 'height' => $height));
   }
 
-  catch (\GmagickException) {
-    $new_width = $width;
-    $new_height = $height;
-  }
+  return FALSE;
 
-  $image->info['width'] = $new_width;
-  $image->info['height'] = $new_height;
-
-  return $result;
+//  try {
+//    // The following methods could throw an exception. In the case they do, use
+//    // the width and height values passed to the method.
+//    $new_width = $image->handler->getImageWidth();
+//    $new_height = $image->handler->getImageHeight();
+//  }
+//
+//  catch (\GmagickException) {
+//    $new_width = $width;
+//    $new_height = $height;
+//  }
+//
+//  $image->info['width'] = $new_width;
+//  $image->info['height'] = $new_height;
+//
+//  return $result;
 }
 
 /**
@@ -460,13 +459,11 @@ function image_graphicsmagick_toolkit_crop(object $image, int $x, int $y, int $w
  * @see image_desaturate()
  */
 function image_graphicsmagick_toolkit_desaturate(object $image): bool {
-  $effect = (new class {
-    public function __invoke($handler) {
-      return $handler->setImageType(Gmagick::IMGTYPE_GRAYSCALE);
-    }
-  });
+  if ($operation = OperationBase::create('desaturate')) {
+    return $operation->apply($image);
+  }
 
-  return graphicsmagick_image_effect($image, $effect);
+  return FALSE;
 }
 
 /**
@@ -483,13 +480,11 @@ function image_graphicsmagick_toolkit_desaturate(object $image): bool {
  *   TRUE or FALSE, based on success.
  */
 function image_graphicsmagick_toolkit_blur(object $image, float $radius, float $sigma): bool {
-  $effect = (new class {
-    public function __invoke($handler, $radius, $sigma) {
-      return $handler->blurImage($radius, $sigma);
-    }
-  });
+  if ($operation = OperationBase::create('blur')) {
+    return $operation->apply($image, array('radius' => $radius, 'sigma' => $sigma));
+  }
 
-  return graphicsmagick_image_effect($image, $effect, $radius, $sigma);
+  return FALSE;
 }
 
 /**
@@ -502,13 +497,11 @@ function image_graphicsmagick_toolkit_blur(object $image, float $radius, float $
  *   TRUE or FALSE, based on success.
  */
 function image_graphicsmagick_toolkit_despeckle(object $image): bool {
-  $effect = (new class {
-    public function __invoke($handler) {
-      return $handler->despeckleImage();
-    }
-  });
+  if ($operation = OperationBase::create('despeckle')) {
+    return $operation->apply($image);
+  }
 
-  return graphicsmagick_image_effect($image, $effect);
+  return FALSE;
 }
 
 /**
@@ -523,13 +516,11 @@ function image_graphicsmagick_toolkit_despeckle(object $image): bool {
  *   TRUE or FALSE, based on success.
  */
 function image_graphicsmagick_toolkit_edge(object $image, float $radius): bool {
-  $effect = (new class {
-    public function __invoke($handler, $radius) {
-      return $handler->edgeImage($radius);
-    }
-  });
+  if ($operation = OperationBase::create('edge')) {
+    return $operation->apply($image, array('radius' => $radius));
+  }
 
-  return graphicsmagick_image_effect($image, $effect, $radius);
+  return FALSE;
 }
 
 /**
@@ -546,13 +537,11 @@ function image_graphicsmagick_toolkit_edge(object $image, float $radius): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_emboss(object $image, float $radius, float $sigma): bool {
-  $effect = (new class {
-    public function __invoke($handler, $radius, $sigma) {
-      return $handler->embossImage($radius, $sigma);
-    }
-  });
+  if ($operation = OperationBase::create('emboss')) {
+    return $operation->apply($image, array('radius' => $radius, 'sigma' => $sigma));
+  }
 
-  return graphicsmagick_image_effect($image, $effect, $radius, $sigma);
+  return FALSE;
 }
 
 /**
@@ -565,13 +554,11 @@ function image_graphicsmagick_toolkit_emboss(object $image, float $radius, float
  *   TRUE on success, FALSE on failure to blur the image.
  */
 function image_graphicsmagick_toolkit_enhance(object $image): bool {
-  $effect = (new class {
-    public function __invoke($handler) {
-      return $handler->enhanceImage();
-    }
-  });
+  if ($operation = OperationBase::create('enhance')) {
+    return $operation->apply($image);
+  }
 
-  return graphicsmagick_image_effect($image, $effect);
+  return FALSE;
 }
 
 /**
@@ -584,13 +571,11 @@ function image_graphicsmagick_toolkit_enhance(object $image): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_equalize(object $image): bool {
-  $effect = (new class {
-    public function __invoke($handler) {
-      return $handler->equalizeImage();
-    }
-  });
+  if ($operation = OperationBase::create('equalize')) {
+    return $operation->apply($image);
+  }
 
-  return graphicsmagick_image_effect($image, $effect);
+  return FALSE;
 }
 
 /**
@@ -603,13 +588,11 @@ function image_graphicsmagick_toolkit_equalize(object $image): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_flip(object $image): bool {
-  $effect = (new class {
-    public function __invoke($handler) {
-      return $handler->flipImage();
-    }
-  });
+  if ($operation = OperationBase::create('flip')) {
+    return $operation->apply($image);
+  }
 
-  return graphicsmagick_image_effect($image, $effect);
+  return FALSE;
 }
 
 /**
@@ -622,13 +605,11 @@ function image_graphicsmagick_toolkit_flip(object $image): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_flop(object $image): bool {
-  $effect = (new class {
-    public function __invoke($handler) {
-      return $handler->flopImage();
-    }
-  });
+  if ($operation = OperationBase::create('flop')) {
+    return $operation->apply($image);
+  }
 
-  return graphicsmagick_image_effect($image, $effect);
+  return FALSE;
 }
 
 /**
@@ -643,13 +624,11 @@ function image_graphicsmagick_toolkit_flop(object $image): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_gamma(object $image, float $gamma): bool {
-  $effect = (new class {
-    public function __invoke($handler, $gamma) {
-      return $handler->gammaImage($gamma);
-    }
-  });
+  if ($operation = OperationBase::create('gamma')) {
+    return $operation->apply($image, array('gamma' => $gamma));
+  }
 
-  return graphicsmagick_image_effect($image, $effect, $gamma);
+  return FALSE;
 }
 
 /**
@@ -664,13 +643,11 @@ function image_graphicsmagick_toolkit_gamma(object $image, float $gamma): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_noise(object $image, int $noise): bool {
-  $effect = (new class {
-    public function __invoke($handler, $noise) {
-      return $handler->addNoiseImage(ToolkitInfo::noiseOptionToValue($noise));
-    }
-  });
+  if ($operation = OperationBase::create('noise')) {
+    return $operation->apply($image, array('noise' => $noise));
+  }
 
-  return graphicsmagick_image_effect($image, $effect, $noise);
+  return FALSE;
 }
 
 /**
@@ -686,13 +663,11 @@ function image_graphicsmagick_toolkit_noise(object $image, int $noise): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_oil_paint(object $image, float $radius): bool {
-  $effect = (new class {
-    public function __invoke($handler, $radius) {
-      return $handler->oilPaintImage($radius);
-    }
-  });
+  if ($operation = OperationBase::create('oil_paint')) {
+    return $operation->apply($image, array('radius' => $radius));
+  }
 
-  return graphicsmagick_image_effect($image, $effect, $radius);
+  return FALSE;
 }
 
 /**
@@ -707,13 +682,11 @@ function image_graphicsmagick_toolkit_oil_paint(object $image, float $radius): b
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_solarize(object $image, int $level): bool {
-  $effect = (new class {
-    public function __invoke($handler, $level) {
-      return $handler->solarizeImage($level);
-    }
-  });
+  if ($operation = OperationBase::create('solarize')) {
+    return $operation->apply($image, array('level' => $level));
+  }
 
-  return graphicsmagick_image_effect($image, $effect, $level);
+  return FALSE;
 }
 
 /**
@@ -729,13 +702,11 @@ function image_graphicsmagick_toolkit_solarize(object $image, int $level): bool 
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_spread(object $image, float $radius): bool {
-  $effect = (new class {
-    public function __invoke($handler, $radius) {
-      return $handler->spreadImage($radius);
-    }
-  });
+  if ($operation = OperationBase::create('spread')) {
+    return $operation->apply($image, array('radius' => $radius));
+  }
 
-  return graphicsmagick_image_effect($image, $effect, $radius);
+  return FALSE;
 }
 
 /**
@@ -750,13 +721,11 @@ function image_graphicsmagick_toolkit_spread(object $image, float $radius): bool
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_swirl(object $image, float $degrees): bool {
-  $effect = (new class {
-    public function __invoke($handler, $degrees) {
-      return $handler->swirlImage($degrees);
-    }
-  });
+  if ($operation = OperationBase::create('swirl')) {
+    return $operation->apply($image, array('degrees' => $degrees));
+  }
 
-  return graphicsmagick_image_effect($image, $effect, $degrees);
+  return FALSE;
 }
 
 /**
@@ -1283,86 +1252,6 @@ function graphicsmagick_image_load(object $image): bool {
 
     return FALSE;
   }
-
-  return TRUE;
-}
-
-/**
- * Applies an effect to an image.
- *
- * @param object $image
- *   An image object. $image->handler should contain a Gmagick instance used
- *   to load the image.
- *   When the image is loaded with image_load(), and the used image toolkit is
- *   graphicsmagick_toolkit, or when the image is loaded with
- *   graphicsmagick_image_load(), $image->handler is initialized with a Gmagick
- *   instance. If $image->handler hasn't been set, this function will call
- *   graphicsmagick_image_load() to first load the image.
- *
- * @param callable $effect
- *   The callable used to apply the effect.
- * @param array $data
- *   The configuration values for the effect. All the values are passed to the
- *   effect callable, except 'background' that is used from this function to set
- *   the image background color before applying the effect.
- *
- * @return bool
- *   TRUE on success, FALSE on failure to apply the effect.
- */
-function graphicsmagick_image_effect(object $image, callable $effect, ...$data): bool {
-  if (isset($image->handler) && !is_a($image->handler, 'Gmagick')) {
-    // $image->handler has been already set, but it is not a Gmagick instance.
-    // To avoid conflicts with other modules, avoid to save the image and return
-    // FALSE.
-    return FALSE;
-  }
-
-  if (!isset($image->handler)) {
-    if (!graphicsmagick_image_load($image)) {
-      // The file does not contain an image, it does not contain an image
-      // recognized from the Gmagick class, the file is corrupted, or creating a
-      // Gmagick instance was not possible for other reasons. Return FALSE.
-      return FALSE;
-    }
-  }
-
-  try {
-    // Clone the image handler and work with the clone. In case of exceptions,
-    // the original image handler and its state is preserved.
-    $handler = clone $image->handler;
-
-    if (!method_exists($handler, 'getNumberImages') || !method_exists($handler, 'coalesceImages')) {
-      return FALSE;
-    }
-
-    if ($handler->getNumberImages() > 1) {
-      $handler = $handler->coalesceImages();
-
-      do {
-        $handler = $effect($handler, $data);
-      } while ($handler->nextImage());
-
-      $handler = $handler->deconstructImages();
-    }
-    else {
-      $handler = $effect($handler, $data);
-    }
-  }
-  catch (\GmagickException $e) {
-    watchdog_exception('graphicsmagick', $e);
-
-    try {
-      $handler->destroy();
-    }
-    catch (\GmagickException) {
-      // \Gmagick::destroy() can throw an exception, but nothing can be done to
-      // fix that.
-    }
-
-    return FALSE;
-  }
-
-  $image->handler = $handler;
 
   return TRUE;
 }
