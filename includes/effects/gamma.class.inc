@@ -10,7 +10,7 @@ use graphicsmagick\Attribute\EffectOperation;
  */
 #[DefaultSetting('gamma', value: 0.8)]
 #[EffectOperation('gamma', params: array('$gamma'))]
-class GammaEffect extends EffectBase {
+class Gamma extends EffectBase {
 
   /**
    * {@inheritdoc}

@@ -8,4 +8,4 @@ use graphicsmagick\Attribute\EffectOperation;
  * Image 'equalize' effect class.
  */
 #[EffectOperation('equalize')]
-class EqualizeEffect extends EffectBase {}
+class Equalize extends EffectBase {}

@@ -8,4 +8,4 @@ use graphicsmagick\Attribute\EffectOperation;
  * Image 'enhance' effect class.
  */
 #[EffectOperation('enhance')]
-class EnhanceEffect extends EffectBase {}
+class Enhance extends EffectBase {}

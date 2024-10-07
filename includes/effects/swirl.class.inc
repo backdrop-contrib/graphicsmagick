@@ -10,7 +10,7 @@ use graphicsmagick\Attribute\EffectOperation;
  */
 #[DefaultSetting('degrees', value: 10.0)]
 #[EffectOperation('swirl', params: array('$degrees'))]
-class SwirlEffect extends EffectBase {
+class Swirl extends EffectBase {
 
   /**
    * {@inheritdoc}

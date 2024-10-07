@@ -11,7 +11,7 @@ use graphicsmagick\ToolkitInfo;
  */
 #[DefaultSetting('level', value: 8)]
 #[EffectOperation('level', params: array('$level'))]
-class SolarizeEffect extends EffectBase {
+class Solarize extends EffectBase {
 
   /**
    * {@inheritdoc}

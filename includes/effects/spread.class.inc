@@ -10,7 +10,7 @@ use graphicsmagick\Attribute\EffectOperation;
  */
 #[DefaultSetting('radius', value: 2.0)]
 #[EffectOperation('spread', params: array('$radius'))]
-class SpreadEffect extends EffectBase {
+class Spread extends EffectBase {
 
   /**
    * {@inheritdoc}

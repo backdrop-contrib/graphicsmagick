@@ -10,7 +10,7 @@ use graphicsmagick\Attribute\EffectOperation;
  */
 #[DefaultSetting('radius', value: 0.8)]
 #[EffectOperation('radius', params: array('$radius'))]
-class OilPaintEffect extends EffectBase {
+class OilPaint extends EffectBase {
 
   /**
    * {@inheritdoc}

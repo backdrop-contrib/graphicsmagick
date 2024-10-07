@@ -5,7 +5,7 @@ namespace graphicsmagick\Effect;
 use graphicsmagick\Attribute\EffectOperation;
 
 /**
- * Image 'flip' effect class.
+ * Image 'flop' effect class.
  */
-#[EffectOperation('flip')]
-class FlipEffect extends EffectBase {}
+#[EffectOperation('flop')]
+class Flop extends EffectBase {}

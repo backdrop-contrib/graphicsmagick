@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Contains \graphicsmagick\Effect\Blur.
+ */
 
 namespace graphicsmagick\Effect;
 
@@ -11,7 +15,7 @@ use graphicsmagick\Attribute\EffectOperation;
 #[DefaultSetting('radius', value: 0.0)]
 #[DefaultSetting('sigma', value: 1.0)]
 #[EffectOperation('blur', params: array('$radius', '$sigma'))]
-class BlurEffect extends EffectBase {
+class Blur extends EffectBase {
   /**
    * {@inheritdoc}
    * @param array $data

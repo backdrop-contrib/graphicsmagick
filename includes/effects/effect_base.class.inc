@@ -38,7 +38,7 @@ class EffectBase implements EffectInterface {
    *   The effect object or NULL if the effect could not be created.
    */
   public static function create(string $id): ?EffectBase {
-    $class_name = 'graphicsmagick\Effect\\' . str_replace('_', '', ucwords($id, '_')) . 'Effect';
+    $class_name = 'graphicsmagick\Effect\\' . str_replace('_', '', ucwords($id, '_'));
     try {
       $reflection = new \ReflectionClass($class_name);
 

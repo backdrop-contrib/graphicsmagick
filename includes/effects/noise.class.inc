@@ -11,7 +11,7 @@ use graphicsmagick\ToolkitInfo;
  */
 #[DefaultSetting('noise', value: 'uniform')]
 #[EffectOperation('noise', params: array('$noise'))]
-class NoiseEffect extends EffectBase {
+class Noise extends EffectBase {
 
   /**
    * {@inheritdoc}

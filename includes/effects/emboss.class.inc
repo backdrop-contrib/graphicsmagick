@@ -11,7 +11,7 @@ use graphicsmagick\Attribute\EffectOperation;
 #[DefaultSetting('radius', value: 0.0)]
 #[DefaultSetting('sigma', value: 1.0)]
 #[EffectOperation('emboss', params: array('$radius', '$sigma'))]
-class EmbossEffect extends EffectBase {
+class Emboss extends EffectBase {
 
   /**
    * {@inheritdoc}
