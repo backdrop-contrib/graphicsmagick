@@ -14,6 +14,7 @@
     <unchecked_exceptions>
       <fqn value="\Error" />
       <fqn value="\GmagickException" />
+      <fqn value="\GmagickPixelException" />
       <fqn value="\LogicException" />
       <fqn value="\RuntimeException" />
     </unchecked_exceptions>

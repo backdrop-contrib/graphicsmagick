@@ -17,7 +17,7 @@ function graphicsmagick_requirements($phase): array {
 
   if (extension_loaded('gmagick') && class_exists('Gmagick')) {
     try {
-      $version_array = \Gmagick::getVersion();
+      $version_array = (new Gmagick)->getVersion();
       $version = $version_array['versionString'] ?? ($version_array['versionNumber'] ?? NULL);
 
       $requirements['graphicsmagick_extension']['severity'] = REQUIREMENT_OK;

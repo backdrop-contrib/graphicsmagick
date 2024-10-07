@@ -6,6 +6,8 @@
 
 declare(strict_types=1);
 
+use graphicsmagick\ToolkitInfo;
+
 /**
  * Returns HTML for the summary of the image blur effect.
  *
@@ -60,7 +62,7 @@ function theme_graphicsmagick_effects_gamma_summary(array $variables): string {
  */
 function theme_graphicsmagick_effects_noise_summary(array $variables): string {
   $data = $variables['data'];
-  $options = graphicsmagick_image_noise_options();
+  $options = ToolkitInfo::noiseOptions();
   $summary = '';
 
   if ($data['noise'] && isset($options[$data['noise']])) {

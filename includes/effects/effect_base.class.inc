@@ -36,7 +36,7 @@ class EffectBase implements EffectInterface {
    * @param string $id
    *   The ID of the effect.
    *
-   * @return \graphicsmagick\Effect\EffectBase|null
+   * @return \graphicsmagick\EffectBase|null
    *   The effect object or NULL if the effect could not be created.
    */
   public static function create(string $id): ?EffectBase {

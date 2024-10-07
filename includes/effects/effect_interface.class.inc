@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace graphicsmagick\Effect;
+namespace graphicsmagick;
 
 /**
  * Interface for image effects.
