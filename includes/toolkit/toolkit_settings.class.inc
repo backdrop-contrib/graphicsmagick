@@ -4,6 +4,8 @@
  * Contains \graphicsmagick\ToolkitSettings.
  */
 
+declare(strict_types=1);
+
 namespace graphicsmagick;
 
 use graphicsmagick\Attribute\DefaultSetting;

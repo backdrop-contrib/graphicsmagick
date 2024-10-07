@@ -4,6 +4,8 @@
  * Theme functions for the GraphicsMagick module.
  */
 
+declare(strict_types=1);
+
 /**
  * Returns HTML for the summary of the image blur effect.
  *

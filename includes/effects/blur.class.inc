@@ -8,6 +8,7 @@ namespace graphicsmagick\Effect;
 
 use graphicsmagick\Attribute\DefaultSetting;
 use graphicsmagick\Attribute\EffectOperation;
+use graphicsmagick\EffectBase;
 
 /**
  * Image 'blur' effect class.

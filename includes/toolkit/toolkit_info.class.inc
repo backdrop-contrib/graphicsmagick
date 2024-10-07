@@ -4,6 +4,8 @@
  * Contains \graphicsmagick\ToolkitInfo.
  */
 
+declare(strict_types=1);
+
 namespace graphicsmagick;
 
 /**

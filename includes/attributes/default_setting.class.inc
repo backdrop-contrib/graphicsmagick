@@ -4,6 +4,8 @@
  * Contains \graphicsmagick\Attribute\DefaultSetting.
  */
 
+declare(strict_types=1);
+
 namespace graphicsmagick\Attribute;
 
 /**

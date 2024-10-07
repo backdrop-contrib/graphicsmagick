@@ -1,9 +1,16 @@
 <?php
+/**
+ * @file
+ * Contains \graphicsmagick\Effect\DespeckleEffect.
+ */
+
+declare(strict_types=1);
 
 namespace graphicsmagick\Effect;
 
 use graphicsmagick\Attribute\EffectOperation;
 use graphicsmagick\Attribute\DefaultSetting;
+use graphicsmagick\EffectBase;
 
 /**
  * Image 'despeckle' effect class.

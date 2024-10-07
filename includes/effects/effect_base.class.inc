@@ -1,10 +1,12 @@
 <?php
 /**
  * @file
- * Contains \graphicsmagick\Effect\EffectBase.
+ * Contains \graphicsmagick\EffectBase.
  */
 
-namespace graphicsmagick\Effect;
+declare(strict_types=1);
+
+namespace graphicsmagick;
 
 use graphicsmagick\Attribute\DefaultSetting;
 use graphicsmagick\Attribute\EffectOperation;

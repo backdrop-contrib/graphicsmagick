@@ -4,6 +4,8 @@
  * Contains \graphicsmagick\OperationInterface.
  */
 
+declare(strict_types=1);
+
 namespace graphicsmagick;
 
 /**

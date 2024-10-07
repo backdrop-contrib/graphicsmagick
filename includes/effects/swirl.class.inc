@@ -1,9 +1,16 @@
 <?php
+/**
+ * @file
+ * Contains \graphicsmagick\Effect\Swirl.
+ */
+
+declare(strict_types=1);
 
 namespace graphicsmagick\Effect;
 
 use graphicsmagick\Attribute\DefaultSetting;
 use graphicsmagick\Attribute\EffectOperation;
+use graphicsmagick\EffectBase;
 
 /**
  * Image 'swirl' effect class.

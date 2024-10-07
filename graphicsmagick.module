@@ -4,7 +4,9 @@
  * Hooks implementations for the GraphicsMagick module.
  */
 
-use graphicsmagick\Effect\EffectBase;
+declare(strict_types=1);
+
+use graphicsmagick\EffectBase;
 use graphicsmagick\OperationBase;
 use graphicsmagick\ToolkitInfo;
 use graphicsmagick\ToolkitSettings;
@@ -19,8 +21,6 @@ function graphicsmagick_autoload_info(): array {
     'graphicsmagick\Attribute\EffectOperation' => 'includes/attributes/effect_operation.class.inc',
     'graphicsmagick\Effect\Blur' => 'includes/effects/blur.class.inc',
     'graphicsmagick\Effect\Despeckle' => 'includes/effects/despeckle.class.inc',
-    'graphicsmagick\Effect\EffectBase' => 'includes/effects/effect_base.class.inc',
-    'graphicsmagick\Effect\EffectInterface' => 'includes/effects/effect_interface.class.inc',
     'graphicsmagick\Effect\Emboss' => 'includes/effects/emboss.class.inc',
     'graphicsmagick\Effect\Equalize' => 'includes/effects/equalize.class.inc',
     'graphicsmagick\Effect\Flip' => 'includes/effects/flip.class.inc',
@@ -31,6 +31,8 @@ function graphicsmagick_autoload_info(): array {
     'graphicsmagick\Effect\Solarize' => 'includes/effects/solarize.class.inc',
     'graphicsmagick\Effect\Spread' => 'includes/effects/spread.class.inc',
     'graphicsmagick\Effect\Swirl' => 'includes/effects/swirl.class.inc',
+    'graphicsmagick\EffectBase' => 'includes/effects/effect_base.class.inc',
+    'graphicsmagick\EffectInterface' => 'includes/effects/effect_interface.class.inc',
     'graphicsmagick\MultipleImagesOperationBase' => 'includes/operations/multiple_images_operation_base.class.inc',
     'graphicsmagick\Operation\Blur' => 'includes/operations/blur.class.inc',
     'graphicsmagick\Operation\Crop' => 'includes/operations/crop.class.inc',

@@ -4,6 +4,8 @@
  * Install, update, and uninstall hooks for the GraphicsMagick module.
  */
 
+declare(strict_types=1);
+
 /**
  * Implements hook_requirements().
  */

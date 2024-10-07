@@ -1,4 +1,10 @@
 <?php
+/**
+ * @file
+ * Contains \graphicsmagick\ToolkitSettingsInterface.
+ */
+
+declare(strict_types=1);
 
 namespace graphicsmagick;
 

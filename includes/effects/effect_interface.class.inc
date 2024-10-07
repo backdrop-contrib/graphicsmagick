@@ -1,8 +1,10 @@
 <?php
 /**
  * @file
- * Contains \graphicsmagick\Effect\EffectInterface.
+ * Contains \graphicsmagick\EffectInterface.
  */
+
+declare(strict_types=1);
 
 namespace graphicsmagick\Effect;
 

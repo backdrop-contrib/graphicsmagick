@@ -4,6 +4,8 @@
  * Contains \graphicsmagick\Operation\Blur.
  */
 
+declare(strict_types=1);
+
 namespace graphicsmagick\Operation;
 
 use graphicsmagick\MultipleImagesOperationBase;
