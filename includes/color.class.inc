@@ -2,12 +2,10 @@
 
 /**
  * @file
- * Contains \graphicsmagick\Utility\Color.
+ * Contains Color.
  */
 
 declare(strict_types=1);
-
-namespace graphicsmagick\Utility;
 
 /**
  * Performs color conversions.
@@ -25,9 +23,9 @@ class Color {
    */
   public static function validate(string $value): bool {
     try {
-      new \GmagickPixel($value);
+      new GmagickPixel($value);
     }
-    catch (\GmagickPixelException) {
+    catch (GmagickPixelException) {
       return FALSE;
     }
 
@@ -46,28 +44,28 @@ class Color {
    * @return array
    *   An array containing the 'r', 'g', 'b', and 'a' keys.
    *
-   * @throws \InvalidArgumentException
+   * @throws InvalidArgumentException
    *   The argument is not a valid color value.
    */
   public static function toRgb(?string $value, bool $include_alpha = FALSE): array {
     try {
-      $pixel = new \GmagickPixel($value ?? 'transparent');
+      $pixel = new GmagickPixel($value ?? 'transparent');
       $color = $pixel->getColor(TRUE);
 
       if ($include_alpha) {
         // GmagickPixel::getColor() doesn't include the alpha channel, which
         // needs to be retrieved with GmagickPixel::getColorValue().
-        // \Gmagick::Gmagick::COLOR_ALPHA throws
+        // Gmagick::COLOR_ALPHA throws
         // "GmagickPixelException: Unknown color type" despite the constant is
         // shown from `php --rc Gmagick`. The code only works with
-        // \Gmagick::COLOR_OPACITY, which apparently returns the alpha value,
+        // Gmagick::COLOR_OPACITY, which apparently returns the alpha value,
         // not the opacity value (whose value would be 1 - $alpha).
-        $alpha = $pixel->getColorValue(\Gmagick::COLOR_OPACITY);
+        $alpha = $pixel->getColorValue(Gmagick::COLOR_OPACITY);
         $color['a'] = intval(round(256 * $alpha));
       }
     }
-    catch (\GmagickPixelException $e) {
-      throw new \InvalidArgumentException("'$value' is not a valid color value.", 0, $e);
+    catch (GmagickPixelException $e) {
+      throw new InvalidArgumentException("'$value' is not a valid color value.", 0, $e);
     }
 
     return $color;
@@ -86,7 +84,7 @@ class Color {
    * @return string
    *   The lowercase simple color representation of the given color.
    *
-   * @throws \InvalidArgumentException
+   * @throws InvalidArgumentException
    *   The argument is not a valid color value.
    */
   public static function toHex(array|string|null $input, bool $include_alpha = FALSE): string {
@@ -98,22 +96,22 @@ class Color {
 
     if (is_string($input)) {
       try {
-        $pixel = new \GmagickPixel($input);
+        $pixel = new GmagickPixel($input);
         $input = $pixel->getColor(TRUE);
 
         if ($include_alpha) {
         // GmagickPixel::getColor() doesn't include the alpha channel, which
         // needs to be retrieved with GmagickPixel::getColorValue().
-        // \Gmagick::Gmagick::COLOR_ALPHA throws
+        // Gmagick::COLOR_ALPHA throws
         // "GmagickPixelException: Unknown color type" despite the constant is
         // shown from `php --rc Gmagick`. The code only works with
-        // \Gmagick::COLOR_OPACITY.
-        $alpha = $pixel->getColorValue(\Gmagick::COLOR_OPACITY);
+        // Gmagick::COLOR_OPACITY.
+        $alpha = $pixel->getColorValue(Gmagick::COLOR_OPACITY);
           $input['a'] = intval(round(256 * $alpha));
         }
       }
-      catch (\GmagickPixelException $e) {
-        throw new \InvalidArgumentException("'$input' is not a valid color value.", 0, $e);
+      catch (GmagickPixelException $e) {
+        throw new InvalidArgumentException("'$input' is not a valid color value.", 0, $e);
       }
     }
 

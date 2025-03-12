@@ -6,60 +6,60 @@
 
 declare(strict_types=1);
 
-use graphicsmagick\EffectBase;
-use graphicsmagick\OperationBase;
-use graphicsmagick\ToolkitInfo;
-use graphicsmagick\ToolkitSettings;
-use graphicsmagick\Utility\Color;
 
 /**
  * Implements hook_autoload_info().
  */
 function graphicsmagick_autoload_info(): array {
   return array(
-    'graphicsmagick\Attribute\DefaultSetting' => 'includes/attributes/default_setting.class.inc',
-    'graphicsmagick\Attribute\EffectOperation' => 'includes/attributes/effect_operation.class.inc',
-    'graphicsmagick\Effect\Blur' => 'includes/effects/blur.class.inc',
-    'graphicsmagick\Effect\Despeckle' => 'includes/effects/despeckle.class.inc',
-    'graphicsmagick\Effect\Emboss' => 'includes/effects/emboss.class.inc',
-    'graphicsmagick\Effect\Equalize' => 'includes/effects/equalize.class.inc',
-    'graphicsmagick\Effect\Flip' => 'includes/effects/flip.class.inc',
-    'graphicsmagick\Effect\Flop' => 'includes/effects/flop.class.inc',
-    'graphicsmagick\Effect\Gamma' => 'includes/effects/gamma.class.inc',
-    'graphicsmagick\Effect\Noise' => 'includes/effects/noise.class.inc',
-    'graphicsmagick\Effect\OilPaint' => 'includes/effects/oil_paint.class.inc',
-    'graphicsmagick\Effect\Solarize' => 'includes/effects/solarize.class.inc',
-    'graphicsmagick\Effect\Spread' => 'includes/effects/spread.class.inc',
-    'graphicsmagick\Effect\Swirl' => 'includes/effects/swirl.class.inc',
-    'graphicsmagick\EffectBase' => 'includes/effects/effect_base.class.inc',
-    'graphicsmagick\EffectInterface' => 'includes/effects/effect_interface.class.inc',
-    'graphicsmagick\MultipleImagesOperationBase' => 'includes/operations/multiple_images_operation_base.class.inc',
-    'graphicsmagick\Operation\Blur' => 'includes/operations/blur.class.inc',
-    'graphicsmagick\Operation\Crop' => 'includes/operations/crop.class.inc',
-    'graphicsmagick\Operation\Desaturate' => 'includes/operations/desaturate.class.inc',
-    'graphicsmagick\Operation\Despeckle' => 'includes/operations/despeckle.class.inc',
-    'graphicsmagick\Operation\Edge' => 'includes/operations/edge.class.inc',
-    'graphicsmagick\Operation\Emboss' => 'includes/operations/emboss.class.inc',
-    'graphicsmagick\Operation\Enhance' => 'includes/operations/enhance.class.inc',
-    'graphicsmagick\Operation\Equalize' => 'includes/operations/equalize.class.inc',
-    'graphicsmagick\Operation\Flip' => 'includes/operations/flip.class.inc',
-    'graphicsmagick\Operation\Flop' => 'includes/operations/flop.class.inc',
-    'graphicsmagick\Operation\Gamma' => 'includes/operations/gamma.class.inc',
-    'graphicsmagick\Operation\Noise' => 'includes/operations/noise.class.inc',
-    'graphicsmagick\Operation\OilPaint' => 'includes/operations/oil_paint.class.inc',
-    'graphicsmagick\Operation\Resize' => 'includes/operations/resize.class.inc',
-    'graphicsmagick\Operation\Rotate' => 'includes/operations/rotate.class.inc',
-    'graphicsmagick\Operation\Solarize' => 'includes/operations/solarize.class.inc',
-    'graphicsmagick\Operation\Spread' => 'includes/operations/spread.class.inc',
-    'graphicsmagick\Operation\Swirl' => 'includes/operations/swirl.class.inc',
-    'graphicsmagick\OperationBase' => 'includes/operations/operation_base.class.inc',
-    'graphicsmagick\OperationInterface' => 'includes/operations/operation_interface.class.inc',
-    'graphicsmagick\SingleImageOperationBase' => 'includes/operations/single_image_operation_base.class.inc',
-    'graphicsmagick\ToolkitInfo' => 'includes/toolkit_info.class.inc',
-    'graphicsmagick\ToolkitInfoInterface' => 'includes/toolkit_info_interface.class.inc',
-    'graphicsmagick\ToolkitSettings' => 'includes/toolkit_settings.class.inc',
-    'graphicsmagick\ToolkitSettingsInterface' => 'includes/toolkit_settings_interface.class.inc',
-    'graphicsmagick\Utility\Color' => 'includes/color.class.inc',
+    'BlurEffect' => 'includes/blur_effect.class.inc',
+    'BlurOperation' => 'includes/blur_operation.class.inc',
+    'Color' => 'includes/color.class.inc',
+    'CropOperation' => 'includes/crop_operation.class.inc',
+    'DefaultSetting' => 'includes/default_setting.class.inc',
+    'DesaturateOperation' => 'includes/desaturate_operation.class.inc',
+    'DespeckleEffect' => 'includes/despeckle_effect.class.inc',
+    'DespeckleOperation' => 'includes/despeckle_operation.class.inc',
+    'EdgeEffect' => 'includes/edge_effect.class.inc',
+    'EdgeOperation' => 'includes/edge_operation.class.inc',
+    'EffectBase' => 'includes/effect_base.class.inc',
+    'EffectInterface' => 'includes/effect_interface.class.inc',
+    'EmbossEffect' => 'includes/emboss_effect.class.inc',
+    'EmbossOperation' => 'includes/emboss_operation.class.inc',
+    'EnhanceEffect' => 'includes/enhance_effect.class.inc',
+    'EnhanceOperation' => 'includes/enhance_operation.class.inc',
+    'EqualizeEffect' => 'includes/equalize_effect.class.inc',
+    'EqualizeOperation' => 'includes/equalize_operation.class.inc',
+    'FileException'=> 'includes/file_exception.class.inc',
+    'FileWriteException'=> 'includes/file_write_exception.class.inc',
+    'FlipEffect' => 'includes/flip_effect.class.inc',
+    'FlipOperation' => 'includes/flip_operation.class.inc',
+    'FlopEffect' => 'includes/flop_effect.class.inc',
+    'FlopOperation' => 'includes/flop_operation.class.inc',
+    'GammaEffect' => 'includes/gamma_effect.class.inc',
+    'GammaOperation' => 'includes/gamma_operation.class.inc',
+    'ImageHandler' => 'includes/image_handler.class.inc',
+    'MultipleImagesOperationBase' => 'includes/multiple_images_operation_base.class.inc',
+    'NoiseEffect' => 'includes/noise_effect.class.inc',
+    'NoiseOperation' => 'includes/noise_operation.class.inc',
+    'OilPaintEffect' => 'includes/oil_paint_effect.class.inc',
+    'OilPaintOperation' => 'includes/oil_paint_operation.class.inc',
+    'OperationBase' => 'includes/operation_base.class.inc',
+    'OperationInterface' => 'includes/operation_interface.class.inc',
+    'OperationParams' => 'includes/effect_operation.class.inc',
+    'ResizeOperation' => 'includes/resize_operation.class.inc',
+    'RotateOperation' => 'includes/rotate_operation.class.inc',
+    'SingleImageOperationBase' => 'includes/single_image_operation_base.class.inc',
+    'SolarizeEffect' => 'includes/solarize_effect.class.inc',
+    'SolarizeOperation' => 'includes/solarize_operation.class.inc',
+    'SpreadEffect' => 'includes/spread_effect.class.inc',
+    'SpreadOperation' => 'includes/spread_operation.class.inc',
+    'SwirlEffect' => 'includes/swirl_effect.class.inc',
+    'SwirlOperation' => 'includes/swirl_operation.class.inc',
+    'ToolkitInfo' => 'includes/toolkit_info.class.inc',
+    'ToolkitInfoInterface' => 'includes/toolkit_info_interface.class.inc',
+    'ToolkitSettings' => 'includes/toolkit_settings.class.inc',
+    'ToolkitSettingsInterface' => 'includes/toolkit_settings_interface.class.inc',
   );
 }
 
@@ -86,7 +86,7 @@ function graphicsmagick_image_effect_info(): array {
   );
 
   $effects['graphicsmagick_effects_edge'] = array(
-    'label' => t('Edge enhance'),
+    'label' => t('EdgeEffect enhance'),
     'help' => t('This effect will enhance edges within the image with a convolution filter.'),
     'dimensions passthrough' => TRUE,
     'form callback' => 'graphicsmagick_effects_edge_form',
@@ -159,7 +159,7 @@ function graphicsmagick_image_effect_info(): array {
 
   $effects['graphicsmagick_effects_solarize'] = array(
     'label' => t('Solarize'),
-    'help' => t('Solarize will apply an effect to the image, similar to the one achieved in a photo darkroom by selectively exposing areas of photo sensitive paper to light.'),
+    'help' => t('SolarizeEffect will apply an effect to the image, similar to the one achieved in a photo darkroom by selectively exposing areas of photo sensitive paper to light.'),
     'dimensions passthrough' => TRUE,
     'form callback' => 'graphicsmagick_effects_solarize_form',
     'effect callback' => 'graphicsmagick_effects_solarize',
@@ -193,7 +193,7 @@ function graphicsmagick_image_toolkits(): array {
     $toolkit_info = new ToolkitInfo();
     $available = $toolkit_info->isAvailable();
   }
-  catch (\RuntimeException $e) {
+  catch (RuntimeException $e) {
     watchdog_exception('graphicsmagick', $e);
 
     $available = FALSE;
@@ -253,7 +253,7 @@ function image_graphicsmagick_toolkit_supported_extensions(): array {
 
     return $toolkit_info->supportedExtensions();
   }
-  catch (\RuntimeException $e) {
+  catch (RuntimeException $e) {
     watchdog_exception('graphicsmagick', $e);
 
     return array();
@@ -316,11 +316,11 @@ function image_graphicsmagick_toolkit_get_info(object $image): false|array {
   );
 
   try {
-    $handler = new \Gmagick(backdrop_realpath($image->source));
+    $handler = new Gmagick(backdrop_realpath($image->source));
     $details['width'] = $handler->getImageWidth();
     $details['height'] = $handler->getImageHeight();
   }
-  catch (\GmagickException) {
+  catch (GmagickException) {
     // An exception has been thrown when trying to access the image information,
     // which could also mean the image file is corrupted. Return FALSE to signal
     // an error.
@@ -380,7 +380,7 @@ function image_graphicsmagick_toolkit_rotate(object $image, int $degrees, int|st
       return $operation->apply($image, array('degrees' => $degrees, 'background' => $color));
     }
   }
-  catch (\InvalidArgumentException $e) {
+  catch (InvalidArgumentException $e) {
     watchdog_exception('graphicsmagick', $e);
     return FALSE;
   }
@@ -1216,7 +1216,7 @@ function graphicsmagick_image_load(object $image): bool {
     $toolkit_info = new ToolkitInfo();
     $image->mimeType = $toolkit_info->mimeTypeFromFormat($format);
   }
-  catch (\RuntimeException $e) {
+  catch (RuntimeException $e) {
     watchdog_exception('graphicsmagick', $e);
 
     return FALSE;
@@ -1274,7 +1274,7 @@ function graphicsmagick_image_save(object $image, string $destination): bool {
 
     $image->handler->writeImage(backdrop_realpath($destination), $image->handler->getNumberImages() > 1);
     return TRUE;
-  } catch (\GmagickException) {
+  } catch (GmagickException) {
     return FALSE;
   }
 }

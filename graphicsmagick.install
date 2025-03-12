@@ -7,6 +7,24 @@
 declare(strict_types=1);
 
 /**
+ * Clears the image effect definitions cache.
+ *
+ * This function is used to reset the static cache and delete cached image
+ * effect definitions when necessary. It ensures that cache clearing is
+ * performed only once per request to avoid redundant operations.
+ */
+function _graphicsmagick_clear_image_effect_definitions(): void {
+  static $already_called = FALSE;
+
+  if (!$already_called) {
+    $already_called = TRUE;
+
+    backdrop_static_reset('image_effect_definitions');
+    cache()->deletePrefix('image_effect_definitions:');
+  }
+}
+
+/**
  * Implements hook_requirements().
  */
 function graphicsmagick_requirements($phase): array {
@@ -27,7 +45,7 @@ function graphicsmagick_requirements($phase): array {
         array('@gmagick_link' => 'https://www.php.net/manual/en/book.gmagick.php')
       );
     }
-    catch (\GmagickException|\Error) {
+    catch (GmagickException|Error) {
       $requirements['graphicsmagick_extension']['severity'] = REQUIREMENT_ERROR;
       $requirements['graphicsmagick_extension']['value'] = $t('Version: unknown');
       $requirements['graphicsmagick_extension']['description'] = $t(
@@ -39,7 +57,7 @@ function graphicsmagick_requirements($phase): array {
     }
 
     try {
-      $handler = new \Gmagick();
+      $handler = new Gmagick();
 
       // Verify the undocumented methods used by the toolkit are implemented.
       $missing_methods = FALSE;
@@ -55,7 +73,7 @@ function graphicsmagick_requirements($phase): array {
         );
       }
     }
-    catch (\GmagickException|\Error) {
+    catch (GmagickException|Error) {
       $requirements['graphicsmagick_extension']['severity'] = REQUIREMENT_ERROR;
       $requirements['graphicsmagick_extension']['description'] = $t(
         'The <a href="@gmagick_link">Gmagick</a> extension has been loaded, but there has been an error when using the class it implements.',
@@ -126,6 +144,14 @@ function graphicsmagick_update_1101(): void {
  * Clear the image effect definitions cache.
  */
 function graphicsmagick_update_1102(): void {
-  backdrop_static_reset('image_effect_definitions');
-  cache()->deletePrefix('image_effect_definitions:');
+  _graphicsmagick_clear_image_effect_definitions();
 }
+
+/**
+ * Clear the image effect definitions cache.
+ */
+function graphicsmagick_update_1103(): void {
+  _graphicsmagick_clear_image_effect_definitions();
+}
+
+

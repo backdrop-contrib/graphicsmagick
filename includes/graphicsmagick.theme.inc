@@ -6,7 +6,6 @@
 
 declare(strict_types=1);
 
-use graphicsmagick\ToolkitInfo;
 
 /**
  * Returns HTML for the summary of the image blur effect.
