@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'swirl' GraphicsMagick operation.
  */
-class SwirlOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class SwirlOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

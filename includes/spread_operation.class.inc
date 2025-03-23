@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'spread' GraphicsMagick operation.
  */
-class SpreadOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class SpreadOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

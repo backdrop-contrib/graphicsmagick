@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'rotate' GraphicsMagick operation.
  */
-class RotateOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class RotateOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

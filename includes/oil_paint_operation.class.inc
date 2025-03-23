@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'oil_paint' GraphicsMagick operation.
  */
-class OilPaintOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class OilPaintOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

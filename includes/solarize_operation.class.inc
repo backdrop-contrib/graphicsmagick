@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'solarize' GraphicsMagick operation.
  */
-class SolarizeOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class SolarizeOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

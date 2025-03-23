@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'equalize' GraphicsMagick operation.
  */
-class EqualizeOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class EqualizeOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

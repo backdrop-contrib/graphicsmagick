@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'despeckle' GraphicsMagick operation.
  */
-class DespeckleOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class DespeckleOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

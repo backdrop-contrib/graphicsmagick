@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'edge' GraphicsMagick operation.
  */
-class EdgeOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class EdgeOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'gamma' GraphicsMagick operation.
  */
-class GammaOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class GammaOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

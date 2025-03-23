@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'blur' GraphicsMagick operation.
  */
-class BlurOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class BlurOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

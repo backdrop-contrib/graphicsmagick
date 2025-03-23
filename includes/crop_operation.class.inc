@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'crop' GraphicsMagick operation.
  */
-class CropOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class CropOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'resize' GraphicsMagick operation.
  */
-class ResizeOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class ResizeOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

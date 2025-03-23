@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'desaturate' GraphicsMagick operation.
  */
-class DesaturateOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class DesaturateOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

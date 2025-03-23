@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'enhance' GraphicsMagick operation.
  */
-class EnhanceOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class EnhanceOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

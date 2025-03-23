@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'emboss' GraphicsMagick operation.
  */
-class EmbossOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class EmbossOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

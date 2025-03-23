@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'noise' GraphicsMagick operation.
  */
-class NoiseOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class NoiseOperation extends OperationBase {
 
   /**
    * {@inheritdoc}

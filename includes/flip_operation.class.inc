@@ -9,7 +9,8 @@ declare(strict_types=1);
 /**
  * Class for the 'flip' GraphicsMagick operation.
  */
-class FlipOperation extends MultipleImagesOperationBase {
+#[OperationType('multiple')]
+class FlipOperation extends OperationBase {
 
   /**
    * {@inheritdoc}
