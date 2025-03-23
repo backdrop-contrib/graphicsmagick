@@ -86,13 +86,13 @@ abstract class OperationBase implements OperationInterface {
         $handler = $handler->coalesceImages();
 
         do {
-          $this->runOperation($handler, $arguments ?? array());
+          $this->executeOperation($handler, $arguments ?? array());
         } while ($handler->nextImage());
 
         $handler = $handler->deconstructImages();
       }
       else {
-        $this->runOperation($handler, $arguments ?? array());
+        $this->executeOperation($handler, $arguments ?? array());
       }
     }
     catch (GmagickException | Error) {
