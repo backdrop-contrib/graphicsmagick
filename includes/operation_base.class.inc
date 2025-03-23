@@ -120,6 +120,6 @@ abstract class OperationBase implements OperationInterface {
    * @param array $arguments
    *   An array of arguments for the operation.
    */
-  abstract protected function runOperation(Gmagick &$handler, array $arguments): void;
+  abstract protected function executeOperation(Gmagick &$handler, array $arguments): void;
 
 }

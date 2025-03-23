@@ -15,7 +15,7 @@ class OilPaintOperation extends OperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function runOperation(Gmagick &$handler, array $arguments): void {
+  protected function executeOperation(Gmagick &$handler, array $arguments): void {
     $handler = $handler->oilPaintImage($arguments['radius']);
   }
 

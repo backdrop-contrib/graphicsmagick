@@ -40,7 +40,7 @@ class CropOperation extends OperationBase {
   /**
    * {@inheritdoc}
    */
-  public function runOperation(Gmagick &$handler, array $arguments): void {
+  public function executeOperation(Gmagick &$handler, array $arguments): void {
     $handler = $handler->cropImage(
       $arguments['width'],
       $arguments['height'],
