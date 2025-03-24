@@ -15,8 +15,8 @@ class SpreadOperation extends OperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeOperation(Gmagick &$handler, array $arguments): void {
-    $handler = $handler->spreadImage($arguments['radius']);
+  protected function operationCallback(Gmagick &$gmagick, array $arguments): void {
+    $gmagick = $gmagick->spreadImage($arguments['radius']);
   }
 
 }

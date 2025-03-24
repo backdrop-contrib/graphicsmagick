@@ -15,8 +15,8 @@ class EdgeOperation extends OperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeOperation(Gmagick &$handler, array $arguments): void {
-    $handler = $handler->edgeImage($arguments['radius']);
+  protected function operationCallback(Gmagick &$gmagick, array $arguments): void {
+    $gmagick = $gmagick->edgeImage($arguments['radius']);
   }
 
 }

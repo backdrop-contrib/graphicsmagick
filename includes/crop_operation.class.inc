@@ -40,8 +40,8 @@ class CropOperation extends OperationBase {
   /**
    * {@inheritdoc}
    */
-  public function executeOperation(Gmagick &$handler, array $arguments): void {
-    $handler = $handler->cropImage(
+  public function operationCallback(Gmagick &$gmagick, array $arguments): void {
+    $gmagick = $gmagick->cropImage(
       $arguments['width'],
       $arguments['height'],
       $arguments['x'],
@@ -51,8 +51,8 @@ class CropOperation extends OperationBase {
     // This method is not documented on
     // https://www.php.net/manual/en/class.gmagick.php.
     // Verify it is implemented before using it.
-    if (method_exists($handler, 'setImagePage')) {
-      $handler = $handler->setImagePage(
+    if (method_exists($gmagick, 'setImagePage')) {
+      $gmagick = $gmagick->setImagePage(
         $arguments['width'],
         $arguments['height'],
         $arguments['x'],

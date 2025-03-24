@@ -15,8 +15,8 @@ class FlopOperation extends OperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeOperation(Gmagick &$handler, array $arguments): void {
-    $handler = $handler->flopImage();
+  protected function operationCallback(Gmagick &$gmagick, array $arguments): void {
+    $gmagick = $gmagick->flopImage();
   }
 
 }

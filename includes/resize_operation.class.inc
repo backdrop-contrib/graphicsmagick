@@ -40,8 +40,8 @@ class ResizeOperation extends OperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeOperation(Gmagick &$handler, array $arguments): void {
-    $handler = $handler->resizeImage(
+  protected function operationCallback(Gmagick &$gmagick, array $arguments): void {
+    $gmagick = $gmagick->resizeImage(
       $arguments['width'],
       $arguments['height'],
       // image_resize() does not pass values for the following two parameters.

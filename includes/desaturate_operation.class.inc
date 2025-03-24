@@ -15,8 +15,8 @@ class DesaturateOperation extends OperationBase {
   /**
    * {@inheritdoc}
    */
-  public function executeOperation(Gmagick &$handler, array $arguments): void {
-    $handler = $handler->setImageType(Gmagick::IMGTYPE_GRAYSCALE);
+  public function operationCallback(Gmagick &$gmagick, array $arguments): void {
+    $gmagick = $gmagick->setImageType(Gmagick::IMGTYPE_GRAYSCALE);
   }
 
 }

@@ -15,8 +15,8 @@ class BlurOperation extends OperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeOperation(Gmagick &$handler, array $arguments): void {
-    $handler = $handler->blurImage($arguments['radius'], $arguments['sigma']);
+  protected function operationCallback(Gmagick &$gmagick, array $arguments): void {
+    $gmagick = $gmagick->blurImage($arguments['radius'], $arguments['sigma']);
   }
 
 }

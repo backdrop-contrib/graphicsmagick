@@ -15,9 +15,9 @@ class EmbossOperation extends OperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeOperation(Gmagick &$handler, array $arguments): void {
-    $handler = $handler->setImageType(Gmagick::IMGTYPE_GRAYSCALE);
-    $handler = $handler->embossImage($arguments['radius'], $arguments['sigma']);
+  protected function operationCallback(Gmagick &$gmagick, array $arguments): void {
+    $gmagick = $gmagick->setImageType(Gmagick::IMGTYPE_GRAYSCALE);
+    $gmagick = $gmagick->embossImage($arguments['radius'], $arguments['sigma']);
   }
 
 }

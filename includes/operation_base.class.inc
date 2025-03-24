@@ -55,9 +55,9 @@ abstract class OperationBase implements OperationInterface {
    * {@inheritdoc}
    */
   public function apply(object $image, ?array $arguments = NULL): bool {
-    if (isset($image->handler) && !is_a($image->handler, 'Gmagick')) {
-      // $image->handler has been already set, but it is not a Gmagick instance.
-      // To avoid conflicts with other modules, return FALSE.
+    if (isset($image->handler) && !is_a($image->handler, ImageHandler::class)) {
+      // $image->handler has been already set, but it is not the expected
+      // instance. To avoid conflicts with other modules, return FALSE.
       return FALSE;
     }
 
@@ -66,60 +66,18 @@ abstract class OperationBase implements OperationInterface {
       return FALSE;
     }
 
-    try {
-      // Clone the image handler and work with the clone. In case of exceptions,
-      // the original image handler and its state is preserved.
-      $handler = clone $image->handler;
+    return $image->handler->applyOperation($this->operationCallback(...), $this->type, $arguments);
 
-      if (!method_exists($handler, 'getNumberImages') || !method_exists($handler, 'coalesceImages')) {
-        // The required methods are not implemented by Gmagick. Return FALSE.
-        return FALSE;
-      }
-
-      $images_count = match ($this->type) {
-        'multiple' => $handler->getNumberImages(),
-        'single' => 1,
-        default => -1
-      };
-
-      if ($images_count > 1) {
-        $handler = $handler->coalesceImages();
-
-        do {
-          $this->executeOperation($handler, $arguments ?? array());
-        } while ($handler->nextImage());
-
-        $handler = $handler->deconstructImages();
-      }
-      else {
-        $this->executeOperation($handler, $arguments ?? array());
-      }
-    }
-    catch (GmagickException | Error) {
-      try {
-        $handler->destroy();
-      }
-      catch (GmagickException) {
-        // Ignore the exception, as there is nothing that can be done when
-        // destroying a Gmagick instance fails.
-      }
-
-      return FALSE;
-    }
-
-    $image->handler = $handler;
-
-    return TRUE;
   }
 
   /**
    * The operation callback.
    *
-   * @param Gmagick $handler
+   * @param Gmagick $gmagick
    *   The Gmagick object.
    * @param array $arguments
    *   An array of arguments for the operation.
    */
-  abstract protected function executeOperation(Gmagick &$handler, array $arguments): void;
+  abstract protected function operationCallback(Gmagick &$gmagick, array $arguments): void;
 
 }

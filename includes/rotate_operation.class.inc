@@ -15,8 +15,8 @@ class RotateOperation extends OperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeOperation(Gmagick &$handler, array $arguments): void {
-    $handler = $handler->rotateImage($arguments['background'], $arguments['degrees']);
+  protected function operationCallback(Gmagick &$gmagick, array $arguments): void {
+    $gmagick = $gmagick->rotateImage($arguments['background'], $arguments['degrees']);
   }
 
 }

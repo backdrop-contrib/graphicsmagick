@@ -15,8 +15,8 @@ class NoiseOperation extends OperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeOperation(Gmagick &$handler, array $arguments): void {
-    $handler = $handler->addNoiseImage($arguments['noise']);
+  protected function operationCallback(Gmagick &$gmagick, array $arguments): void {
+    $gmagick = $gmagick->addNoiseImage($arguments['noise']);
   }
 
 }

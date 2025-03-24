@@ -15,8 +15,8 @@ class GammaOperation extends OperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function executeOperation(Gmagick &$handler, array $arguments): void {
-    $handler = $handler->gammaImage($arguments['gamma']);
+  protected function operationCallback(Gmagick &$gmagick, array $arguments): void {
+    $gmagick = $gmagick->gammaImage($arguments['gamma']);
   }
 
 }

@@ -1169,50 +1169,16 @@ function graphicsmagick_effects_swirl(object $image, array $data): bool {
  *   TRUE or FALSE, based on success.
  */
 function graphicsmagick_image_load(object $image): bool {
-  if (isset($image->handler) && !is_a($image->handler, 'Gmagick')) {
-    // $image->handler has been already set, but it is not a Gmagick instance.
-    // To avoid conflicts with other modules, avoid to load the image and return
-    // FALSE.
-    return FALSE;
-  }
-
-  if (isset($image->handler)) {
-    // Destroy the existing Gmagick instance.
-    try {
-      $image->handler->destroy();
-    } catch (GmagickException) {
-      // Ignore the exception, as there is not anything that can be done when
-      // destroying a Gmagick instance fails.
-    }
-
-    $image->handler = NULL;
-  }
-
   try {
-    if (!isset($image->source) || !is_string($image->source)) {
-      // $image->source must be set to a string containing the source file path.
-      // Return FALSE for error in case it is not.
+    $handler = ImageHandler::create($image);
+
+    if (!$handler) {
       return FALSE;
     }
 
-    $handler = new Gmagick(backdrop_realpath($image->source));
-    $format = $handler->getImageFormat();
-  } catch (GmagickException) {
-    // If either the constructor or getImageFormat() returned an
-    // exception, report a failure to the calling function. An exception in
-    // those cases could mean the file doesn't contain an image, it does not
-    // contain an image recognized from the Gmagick class, or the file is
-    // corrupted.
-    return FALSE;
-  }
-
-
-  $image->handler = $handler;
-  $image->format = $format;
-
-  try {
+    $image->format = $handler->imageFormat();
     $toolkit_info = new ToolkitInfo();
-    $image->mimeType = $toolkit_info->mimeTypeFromFormat($format);
+    $image->mimeType = $toolkit_info->mimeTypeFromFormat($image->format);
   }
   catch (RuntimeException $e) {
     watchdog_exception('graphicsmagick', $e);
@@ -1241,38 +1207,26 @@ function graphicsmagick_image_load(object $image): bool {
 function graphicsmagick_image_save(object $image, string $destination): bool {
   $settings = new ToolkitSettings();
 
-  if (isset($image->handler) && !is_a($image->handler, 'Gmagick')) {
-    // $image->handler has been already set, but it is not a Gmagick instance.
-    // To avoid conflicts with other modules, avoid to save the image and return
-    // FALSE.
+  if (isset($image->handler) && !is_a($image->handler, ImageHandler::class)) {
+    // $image->handler has been already set, but it is not the expected
+    // instance. To avoid conflicts with other modules, avoid to save the image
+    // and return FALSE.
     return FALSE;
   }
 
   if (!isset($image->handler)) {
-    // The image has not been loaded from the file using a Gmagick instance; try
-    // to load it.
-    // Usually, $image->handler is already set. This code has been added to let
-    // a module save an image without first calling image_load() or
-    // graphicsmagick_image_load().
-    if (!graphicsmagick_image_load($image)) {
-      return FALSE;
-    }
-  }
-
-  try {
-    switch ($image->mimeType) {
-      case 'image/jpeg':
-        $image->handler->setCompressionQuality($settings->get('graphicsmagick_toolkit_jpeg_quality'));
-        break;
-
-      case 'image/png';
-        $image->handler->setCompressionQuality($settings->get('graphicsmagick_toolkit_png_quality'));
-        break;
-    }
-
-    $image->handler->writeImage(backdrop_realpath($destination), $image->handler->getNumberImages() > 1);
-    return TRUE;
-  } catch (GmagickException) {
     return FALSE;
   }
+
+  switch ($image->mimeType) {
+    case 'image/jpeg':
+      $image->handler->compressionQuality($settings->get('graphicsmagick_toolkit_jpeg_quality'));
+      break;
+
+    case 'image/png';
+      $image->handler->compressionQuality($settings->get('graphicsmagick_toolkit_png_quality'));
+      break;
+  }
+
+  return $image->handler->save($destination);
 }
