@@ -9,7 +9,7 @@ declare(strict_types=1);
 /**
  * Class for the 'noise' GraphicsMagick operation.
  */
-#[OperationType('multiple')]
+#[OperationType('multiple_frames')]
 class NoiseOperation extends OperationBase {
 
   /**

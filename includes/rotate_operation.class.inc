@@ -9,7 +9,7 @@ declare(strict_types=1);
 /**
  * Class for the 'rotate' GraphicsMagick operation.
  */
-#[OperationType('multiple')]
+#[OperationType('multiple_frames')]
 class RotateOperation extends OperationBase {
 
   /**

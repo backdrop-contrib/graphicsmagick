@@ -9,7 +9,7 @@ declare(strict_types=1);
 /**
  * Class for the 'crop' GraphicsMagick operation.
  */
-#[OperationType('multiple')]
+#[OperationType('multiple_frames')]
 class CropOperation extends OperationBase {
 
   /**

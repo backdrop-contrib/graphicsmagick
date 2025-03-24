@@ -125,14 +125,14 @@ class ImageHandler {
    * argument and an array of settings as the second argument. The callback must
    * operate directly on the Gmagick instance.
    *
-   * If the operation type is "single", the callback will be called once.
-   * If the operation type is "multiple", the callback will be called once for
-   * each image in the Gmagick instance.
+   * If the operation type is "single_frame", the callback will be called once.
+   * If the operation type is "multiple_frames", the callback will be called
+   * once for each frame in the Gmagick instance.
    *
    * @param \Closure $callback
    *   A callback that will be called with the Gmagick instance and the settings.
    * @param string $operation_type
-   *   The operation type, either "single" or "multiple".
+   *   The operation type, either "single_frame" or "multiple_frames".
    * @param ?array $arguments
    *   An array of settings to apply to the image.
    *
@@ -149,8 +149,8 @@ class ImageHandler {
       }
 
       $images_count = match ($operation_type) {
-        'multiple' => $gmagick->getNumberImages(),
-        'single' => 1,
+        'multiple_frames' => $gmagick->getNumberImages(),
+        'single_frame' => 1,
         default => -1
       };
 
