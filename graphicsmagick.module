@@ -318,12 +318,16 @@ function image_graphicsmagick_toolkit_get_info(object $image): false|array {
     $details['width'] = $handler->imageWidth();
     $details['height'] = $handler->imageHeight();
   }
-  catch (GmagickException) {
+  catch (InvalidArgumentException | Error $e) {
     // An exception has been thrown when trying to access the image information,
     // which could also mean the image file is corrupted. Return FALSE to signal
     // an error.
+    watchdog_exception('graphicsmagick', $e);
+
     return FALSE;
   }
+
+  $image->handler = NULL;
 
   return $details;
 }

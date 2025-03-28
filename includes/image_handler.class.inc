@@ -75,6 +75,19 @@ class ImageHandler {
     return file_unmanaged_copy($source, $destination, FILE_EXISTS_REPLACE);
   }
 
+  /**
+   * Creates the image handler.
+   *
+   * @param object $image
+   *   An image object. The $image->handler value will be set by this call.
+   *
+   * @return $this|null
+   *   The image handler or NULL if the image could not be loaded.
+   *
+   * @throws InvalidArgumentException
+   *   $image->handler is not NULL nor an instance of the current class.
+   *   $image->source is not a string.
+   */
   public static function create(object $image): ?self  {
     if (isset($image->handler) && !is_a($image->handler, self::class)) {
       throw new InvalidArgumentException('The image handler must be an instance of ' . self::class . '.');
