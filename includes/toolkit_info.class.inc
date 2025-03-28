@@ -16,7 +16,7 @@ class ToolkitInfo implements ToolkitInfoInterface {
    *
    * @var string[]
    */
-  protected const EXTENSIONS = array(
+  protected const array EXTENSIONS = array(
     'BMP' => 'bmp',
     'CIN' => 'cin',
     'DCX' => 'dcx',
@@ -65,7 +65,7 @@ class ToolkitInfo implements ToolkitInfoInterface {
    *
    * @var string[]
    */
-  protected const MIME_TYPES = array(
+  protected const array MIME_TYPES = array(
     'BIGTIFF' => 'image/tiff',
     'BMP' => 'image/x-ms-bmp',
     'CIN' => 'image/cineon',

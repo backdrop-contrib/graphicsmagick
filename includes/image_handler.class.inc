@@ -159,6 +159,36 @@ class ImageHandler {
   }
 
   /**
+   * Retrieves the height of the current image.
+   *
+   * @return int
+   *   The height of the image, or 0 on failure.
+   */
+  public function imageHeight(): int {
+    try {
+      return $this->gmagick->getImageHeight();
+    }
+    catch (GmagickException | Error) {
+      return 0;
+    }
+  }
+
+  /**
+   * Retrieves the width of the current image.
+   *
+   * @return int
+   *   The width of the image, or 0 on failure.
+   */
+  public function imageWidth(): int {
+    try {
+      return $this->gmagick->getImageWidth();
+    }
+    catch (GmagickException | Error) {
+      return 0;
+    }
+  }
+
+  /**
    * Applies a GraphicsMagick operation to the image.
    *
    * The given callback will be called with a Gmagick instance as the first

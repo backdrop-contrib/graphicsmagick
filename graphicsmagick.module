@@ -314,9 +314,9 @@ function image_graphicsmagick_toolkit_get_info(object $image): false|array {
   );
 
   try {
-    $handler = new Gmagick(backdrop_realpath($image->source));
-    $details['width'] = $handler->getImageWidth();
-    $details['height'] = $handler->getImageHeight();
+    $handler = ImageHandler::create($image);
+    $details['width'] = $handler->imageWidth();
+    $details['height'] = $handler->imageHeight();
   }
   catch (GmagickException) {
     // An exception has been thrown when trying to access the image information,
@@ -1185,7 +1185,6 @@ function graphicsmagick_image_load(object $image): bool {
       return FALSE;
     }
 
-    $image->handler = $handler;
     $image->format = $handler->imageFormat();
     $toolkit_info = new ToolkitInfo();
     $image->mimeType = $toolkit_info->mimeTypeFromFormat($image->format);
