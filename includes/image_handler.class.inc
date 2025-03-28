@@ -115,7 +115,47 @@ class ImageHandler {
   }
 
   public function __destruct() {
+    try {
+      $this->gmagick->destroy();
+    }
+    catch (GmagickException | Error) {
+      // Ignore exception.
+    }
+
     $this->gmagick = NULL;
+  }
+
+  /**
+   * Sets the compression quality for the current image.
+   *
+   * @param int $quality
+   *   The desired compression quality level.
+   */
+  public function compressionQuality(int $quality): void {
+    try {
+      $this->gmagick->setCompressionQuality($quality);
+    }
+    catch (GmagickException | Error) {
+      // Ignore exception.
+    }
+  }
+
+  /**
+   * Retrieves the format of the current image.
+   *
+   * This method returns the format of the image as a string. If an error
+   * occurs while attempting to retrieve the format, an empty string is returned.
+   *
+   * @return string
+   *   The format of the image, or an empty string on failure.
+   */
+  public function imageFormat(): string {
+    try {
+      return $this->gmagick->getImageFormat();
+    }
+    catch (GmagickException | Error) {
+      return '';
+    }
   }
 
   /**
@@ -183,39 +223,6 @@ class ImageHandler {
     $this->gmagick = $gmagick;
 
     return TRUE;
-  }
-
-  /**
-   * Sets the compression quality for the current image.
-   *
-   * @param int $quality
-   *   The desired compression quality level.
-   */
-  public function compressionQuality(int $quality): void {
-    try {
-      $this->gmagick->setCompressionQuality($quality);
-    }
-    catch (GmagickException | Error) {
-      // Ignore exception.
-    }
-  }
-
-  /**
-   * Retrieves the format of the current image.
-   *
-   * This method returns the format of the image as a string. If an error
-   * occurs while attempting to retrieve the format, an empty string is returned.
-   *
-   * @return string
-   *   The format of the image, or an empty string on failure.
-   */
-  public function imageFormat(): string {
-    try {
-      return $this->gmagick->getImageFormat();
-    }
-    catch (GmagickException | Error) {
-      return '';
-    }
   }
 
   /**

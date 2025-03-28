@@ -1169,6 +1169,15 @@ function graphicsmagick_effects_swirl(object $image, array $data): bool {
  *   TRUE or FALSE, based on success.
  */
 function graphicsmagick_image_load(object $image): bool {
+  if (isset($image->handler) && !is_a($image->handler, ImageHandler::class)) {
+    // $image->handler has been already set, but it is not the expected
+    // instance. To avoid conflicts with other modules, avoid to load the image.
+    return FALSE;
+  }
+  elseif (isset($image->handler)) {
+    $image->handler = NULL;
+  }
+
   try {
     $handler = ImageHandler::create($image);
 
@@ -1176,6 +1185,7 @@ function graphicsmagick_image_load(object $image): bool {
       return FALSE;
     }
 
+    $image->handler = $handler;
     $image->format = $handler->imageFormat();
     $toolkit_info = new ToolkitInfo();
     $image->mimeType = $toolkit_info->mimeTypeFromFormat($image->format);
