@@ -121,7 +121,7 @@ class ToolkitInfo implements ToolkitInfoInterface {
       $this->gmagick = new Gmagick();
     }
     catch (GmagickException | Error $e) {
-      throw new RuntimeException('Unable to create an instance of the Gmagick class.', 0, $e);
+      throw new RuntimeException('Unable to create an instance of the Gmagick class.', $e->getCode(), $e);
     }
   }
 
@@ -129,17 +129,10 @@ class ToolkitInfo implements ToolkitInfoInterface {
    * {@inheritdoc}
    */
   public function isAvailable(): bool {
-    if (isset($this->gmagick)) {
-      // Verify the undocumented methods used by the toolkit are implemented.
-      $missing_methods = FALSE;
-      $missing_methods |= !method_exists($this->gmagick, 'getNumberImages');
-      $missing_methods |= !method_exists($this->gmagick, 'coalesceImages');
-      $missing_methods |= !method_exists($this->gmagick, 'deconstructImages');
-
-      return !$missing_methods;
-    }
-
-    return FALSE;
+    return isset($this->gmagick) &&
+      method_exists($this->gmagick, 'getNumberImages') &&
+      method_exists($this->gmagick, 'coalesceImages') &&
+      method_exists($this->gmagick, 'deconstructImages');
   }
 
   /**
@@ -150,10 +143,9 @@ class ToolkitInfo implements ToolkitInfoInterface {
 
     if (isset($this->gmagick)) {
       try {
-        $quantum_level = $this->gmagick->getQuantumDepth()['quantumDepthLong'];
-      }
-      catch (GmagickException) {
-        // As getting the quantum dept value failed, assume its value is 8.
+        $quantum_level = $this->gmagick->getQuantumDepth()['quantumDepthLong'] ?? 8;
+      } catch (GmagickException $e) {
+        // As getting the quantum depth failed, assume it is 8.
       }
     }
 
@@ -208,22 +200,18 @@ class ToolkitInfo implements ToolkitInfoInterface {
    *   The supported extensions.
    */
   public function supportedExtensions(): array {
-    $supported_extensions = array();
-
-    if (isset($this->gmagick)) {
-      try {
-        foreach ($this->gmagick->queryFormats() as $format) {
-          if (isset($extensions[$format])) {
-            $supported_extensions[] = $extensions[$format];
-          }
-        }
-      }
-      catch (GmagickException) {
-        // Ignore the thrown exception.
-      }
+    if (!isset($this->gmagick)) {
+      return array();
     }
 
-    return array_unique($supported_extensions);
+    try {
+      return array_unique(array_intersect_key(
+        self::EXTENSIONS, array_flip($this->gmagick->queryFormats())
+      ));
+    }
+    catch (GmagickException) {
+      return array();
+    }
   }
 
   /**
@@ -237,18 +225,13 @@ class ToolkitInfo implements ToolkitInfoInterface {
    *   if the format is not supported by the GraphicsMagick toolkit.
    */
   public function extensionFromFormat(string $format): string {
-    if (isset(self::EXTENSIONS[$format])) {
-      if (isset($this->gmagick)) {
-        try {
-          $formats = $this->gmagick->queryFormats();
-          if (in_array($format, $formats)) {
-            return self::EXTENSIONS[$format];
-          }
-        }
-        catch (GmagickException) {
-          // Return an empty string, which means the format is not supported.
-          return '';
-        }
+    if (isset(self::EXTENSIONS[$format]) && isset($this->gmagick)) {
+      try {
+        $formats = $this->gmagick->queryFormats();
+        return in_array($format, $formats) ? self::EXTENSIONS[$format] : '';
+      }
+      catch (GmagickException) {
+        return '';
       }
     }
 
@@ -266,18 +249,13 @@ class ToolkitInfo implements ToolkitInfoInterface {
    *   format is not supported by the GraphicsMagick toolkit.
    */
   public function mimeTypeFromFormat(string $format): string {
-    if (isset(self::MIME_TYPES[$format])) {
-      if (isset($this->gmagick)) {
-        try {
-          $formats = $this->gmagick->queryFormats();
-          if (in_array($format, $formats)) {
-            return self::MIME_TYPES[$format];
-          }
-        }
-        catch (GmagickException) {
-          // Return an empty string, which means the format is not supported.
-          return '';
-        }
+    if (isset(self::MIME_TYPES[$format]) && isset($this->gmagick)) {
+      try {
+        $formats = $this->gmagick->queryFormats();
+        return in_array($format, $formats) ? self::MIME_TYPES[$format] : '';
+      }
+      catch (GmagickException) {
+        return '';
       }
     }
 

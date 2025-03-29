@@ -189,20 +189,24 @@ function graphicsmagick_image_effect_info(): array {
 function graphicsmagick_image_toolkits(): array {
   try {
     $toolkit_info = new ToolkitInfo();
-    $available = $toolkit_info->isAvailable();
+
+    return array(
+      'graphicsmagick_toolkit' => array(
+        'title' => t('GraphicsMagick toolkit'),
+        'available' => $toolkit_info->isAvailable(),
+      ),
+    );
   }
   catch (RuntimeException $e) {
     watchdog_exception('graphicsmagick', $e);
 
-    $available = FALSE;
+    return array(
+      'graphicsmagick_toolkit' => array(
+        'title' => t('GraphicsMagick toolkit'),
+        'available' => FALSE,
+      ),
+    );
   }
-
-  return array(
-    'graphicsmagick_toolkit' => array(
-      'title' => t('GraphicsMagick toolkit'),
-      'available' => $available,
-    ),
-  );
 }
 
 /**
@@ -210,21 +214,21 @@ function graphicsmagick_image_toolkits(): array {
  */
 function graphicsmagick_theme(): array {
   $summary_base = array(
-    'variables' => array( 'data' => NULL),
+    'variables' => array('data' => NULL),
     'file' => 'includes/graphicsmagick.theme.inc',
   );
 
-  return array(
-    'graphicsmagick_effects_blur_summary' => $summary_base,
-    'graphicsmagick_effects_edge_summary' => $summary_base,
-    'graphicsmagick_effects_emboss_summary' => $summary_base,
-    'graphicsmagick_effects_gamma_summary' => $summary_base,
-    'graphicsmagick_effects_noise_summary' => $summary_base,
-    'graphicsmagick_effects_oil_paint_summary' => $summary_base,
-    'graphicsmagick_effects_solarize_summary' => $summary_base,
-    'graphicsmagick_effects_spread_summary' => $summary_base,
-    'graphicsmagick_effects_swirl_summary' => $summary_base,
-  );
+  return array_fill_keys(array(
+    'graphicsmagick_effects_blur_summary',
+    'graphicsmagick_effects_edge_summary',
+    'graphicsmagick_effects_emboss_summary',
+    'graphicsmagick_effects_gamma_summary',
+    'graphicsmagick_effects_noise_summary',
+    'graphicsmagick_effects_oil_paint_summary',
+    'graphicsmagick_effects_solarize_summary',
+    'graphicsmagick_effects_spread_summary',
+    'graphicsmagick_effects_swirl_summary',
+  ), $summary_base);
 }
 
 /**
@@ -234,9 +238,7 @@ function graphicsmagick_theme(): array {
  *   The form array.
  */
 function image_graphicsmagick_toolkit_settings(): array {
-  $settings = new ToolkitSettings();
-
-  return $settings->settingsForm();
+  return (new ToolkitSettings())->settingsForm();
 }
 
 /**
@@ -247,9 +249,7 @@ function image_graphicsmagick_toolkit_settings(): array {
  */
 function image_graphicsmagick_toolkit_supported_extensions(): array {
   try {
-    $toolkit_info = new ToolkitInfo();
-
-    return $toolkit_info->supportedExtensions();
+    return (new ToolkitInfo())->supportedExtensions();
   }
   catch (RuntimeException $e) {
     watchdog_exception('graphicsmagick', $e);
@@ -308,26 +308,21 @@ function image_graphicsmagick_toolkit_save(object $image, string $destination): 
  * @see image_get_info()
  */
 function image_graphicsmagick_toolkit_get_info(object $image): false|array {
-  $details = array(
-    'width' => 0,
-    'height' => 0,
-  );
-
   try {
     $handler = ImageHandler::create($image);
-    $details['width'] = $handler->imageWidth();
-    $details['height'] = $handler->imageHeight();
+    $details = array(
+      'width' => $handler->imageWidth(),
+      'height' => $handler->imageHeight(),
+    );
   }
   catch (InvalidArgumentException | Error $e) {
-    // An exception has been thrown when trying to access the image information,
-    // which could also mean the image file is corrupted. Return FALSE to signal
-    // an error.
     watchdog_exception('graphicsmagick', $e);
 
     return FALSE;
   }
-
-  $image->handler = NULL;
+  finally {
+    $image->handler = NULL;
+  }
 
   return $details;
 }
@@ -349,11 +344,12 @@ function image_graphicsmagick_toolkit_get_info(object $image): false|array {
  * @see image_resize()
  */
 function image_graphicsmagick_toolkit_resize(object $image, int $width, int $height): bool {
-  if ($operation = OperationBase::create('resize')) {
-    return $operation->apply($image, array('width' => $width, 'height' => $height));
-  }
+  $operation = OperationBase::create('resize');
 
-  return FALSE;
+  return $operation && $operation->apply($image, array(
+    'width' => $width,
+    'height' => $height,
+  ));
 }
 
 /**
@@ -377,17 +373,19 @@ function image_graphicsmagick_toolkit_resize(object $image, int $width, int $hei
 function image_graphicsmagick_toolkit_rotate(object $image, int $degrees, int|string|null $background): bool {
   try {
     $color = Color::toHex($background);
+    $arguments = array(
+      'degrees' => $degrees,
+      'background' => $color,
+    );
+    $operation = OperationBase::create('rotate');
 
-    if ($operation = OperationBase::create('rotate')) {
-      return $operation->apply($image, array('degrees' => $degrees, 'background' => $color));
-    }
+    return $operation && $operation->apply($image, $arguments);
   }
   catch (InvalidArgumentException $e) {
     watchdog_exception('graphicsmagick', $e);
+
     return FALSE;
   }
-
-  return FALSE;
 }
 
 /**
@@ -411,11 +409,15 @@ function image_graphicsmagick_toolkit_rotate(object $image, int $degrees, int|st
  * @see image_crop()
  */
 function image_graphicsmagick_toolkit_crop(object $image, int $x, int $y, int $width, int $height): bool {
-  if ($operation = OperationBase::create('crop')) {
-    return $operation->apply($image, array('x' => $x, 'y' => $y, 'width' => $width, 'height' => $height));
-  }
+  $arguments = array(
+    'x' => $x,
+    'y' => $y,
+    'width' => $width,
+    'height' => $height
+  );
+  $operation = OperationBase::create('crop');
 
-  return FALSE;
+  return $operation && $operation->apply($image, $arguments);
 }
 
 /**
@@ -430,11 +432,9 @@ function image_graphicsmagick_toolkit_crop(object $image, int $x, int $y, int $w
  * @see image_desaturate()
  */
 function image_graphicsmagick_toolkit_desaturate(object $image): bool {
-  if ($operation = OperationBase::create('desaturate')) {
-    return $operation->apply($image);
-  }
+  $operation = OperationBase::create('desaturate');
 
-  return FALSE;
+  return $operation && $operation->apply($image);
 }
 
 /**
@@ -451,11 +451,13 @@ function image_graphicsmagick_toolkit_desaturate(object $image): bool {
  *   TRUE or FALSE, based on success.
  */
 function image_graphicsmagick_toolkit_blur(object $image, float $radius, float $sigma): bool {
-  if ($operation = OperationBase::create('blur')) {
-    return $operation->apply($image, array('radius' => $radius, 'sigma' => $sigma));
-  }
+  $arguments = array(
+    'radius' => $radius,
+    'sigma' => $sigma,
+  );
+  $operation = OperationBase::create('blur');
 
-  return FALSE;
+  return $operation && $operation->apply($image, $arguments);
 }
 
 /**
@@ -468,11 +470,9 @@ function image_graphicsmagick_toolkit_blur(object $image, float $radius, float $
  *   TRUE or FALSE, based on success.
  */
 function image_graphicsmagick_toolkit_despeckle(object $image): bool {
-  if ($operation = OperationBase::create('despeckle')) {
-    return $operation->apply($image);
-  }
+  $operation = OperationBase::create('despeckle');
 
-  return FALSE;
+  return $operation &&$operation->apply($image);
 }
 
 /**
@@ -487,11 +487,10 @@ function image_graphicsmagick_toolkit_despeckle(object $image): bool {
  *   TRUE or FALSE, based on success.
  */
 function image_graphicsmagick_toolkit_edge(object $image, float $radius): bool {
-  if ($operation = OperationBase::create('edge')) {
-    return $operation->apply($image, array('radius' => $radius));
-  }
+  $arguments = array('radius' => $radius);
+  $operation = OperationBase::create('edge');
 
-  return FALSE;
+  return $operation && $operation->apply($image, $arguments);
 }
 
 /**
@@ -508,11 +507,10 @@ function image_graphicsmagick_toolkit_edge(object $image, float $radius): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_emboss(object $image, float $radius, float $sigma): bool {
-  if ($operation = OperationBase::create('emboss')) {
-    return $operation->apply($image, array('radius' => $radius, 'sigma' => $sigma));
-  }
+  $arguments = array('radius' => $radius, 'sigma' => $sigma);
+  $operation = OperationBase::create('emboss');
 
-  return FALSE;
+  return $operation && $operation->apply($image, $arguments);
 }
 
 /**
@@ -525,11 +523,9 @@ function image_graphicsmagick_toolkit_emboss(object $image, float $radius, float
  *   TRUE on success, FALSE on failure to blur the image.
  */
 function image_graphicsmagick_toolkit_enhance(object $image): bool {
-  if ($operation = OperationBase::create('enhance')) {
-    return $operation->apply($image);
-  }
+  $operation = OperationBase::create('enhance');
 
-  return FALSE;
+  return $operation && $operation->apply($image);
 }
 
 /**
@@ -542,11 +538,9 @@ function image_graphicsmagick_toolkit_enhance(object $image): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_equalize(object $image): bool {
-  if ($operation = OperationBase::create('equalize')) {
-    return $operation->apply($image);
-  }
+  $operation = OperationBase::create('equalize');
 
-  return FALSE;
+  return $operation && $operation->apply($image);
 }
 
 /**
@@ -559,11 +553,9 @@ function image_graphicsmagick_toolkit_equalize(object $image): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_flip(object $image): bool {
-  if ($operation = OperationBase::create('flip')) {
-    return $operation->apply($image);
-  }
+  $operation = OperationBase::create('flip');
 
-  return FALSE;
+  return $operation && $operation->apply($image);
 }
 
 /**
@@ -576,11 +568,9 @@ function image_graphicsmagick_toolkit_flip(object $image): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_flop(object $image): bool {
-  if ($operation = OperationBase::create('flop')) {
-    return $operation->apply($image);
-  }
+  $operation = OperationBase::create('flop');
 
-  return FALSE;
+  return $operation && $operation->apply($image);
 }
 
 /**
@@ -595,11 +585,10 @@ function image_graphicsmagick_toolkit_flop(object $image): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_gamma(object $image, float $gamma): bool {
-  if ($operation = OperationBase::create('gamma')) {
-    return $operation->apply($image, array('gamma' => $gamma));
-  }
+  $arguments = array('gamma' => $gamma);
+  $operation = OperationBase::create('gamma');
 
-  return FALSE;
+  return $operation && $operation->apply($image, $arguments);
 }
 
 /**
@@ -614,11 +603,10 @@ function image_graphicsmagick_toolkit_gamma(object $image, float $gamma): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_noise(object $image, int $noise): bool {
-  if ($operation = OperationBase::create('noise')) {
-    return $operation->apply($image, array('noise' => $noise));
-  }
+  $arguments = array('noise' => $noise);
+  $operation = OperationBase::create('noise');
 
-  return FALSE;
+  return $operation && $operation->apply($image, $arguments);
 }
 
 /**
@@ -634,11 +622,10 @@ function image_graphicsmagick_toolkit_noise(object $image, int $noise): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_oil_paint(object $image, float $radius): bool {
-  if ($operation = OperationBase::create('oil_paint')) {
-    return $operation->apply($image, array('radius' => $radius));
-  }
+  $arguments = array('radius' => $radius);
+  $operation = OperationBase::create('oil_paint');
 
-  return FALSE;
+  return $operation && $operation->apply($image, $arguments);
 }
 
 /**
@@ -653,11 +640,10 @@ function image_graphicsmagick_toolkit_oil_paint(object $image, float $radius): b
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_solarize(object $image, int $level): bool {
-  if ($operation = OperationBase::create('solarize')) {
-    return $operation->apply($image, array('level' => $level));
-  }
+  $arguments = array('level' => $level);
+  $operation = OperationBase::create('solarize');
 
-  return FALSE;
+  return $operation && $operation->apply($image, $arguments);
 }
 
 /**
@@ -673,11 +659,10 @@ function image_graphicsmagick_toolkit_solarize(object $image, int $level): bool 
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_spread(object $image, float $radius): bool {
-  if ($operation = OperationBase::create('spread')) {
-    return $operation->apply($image, array('radius' => $radius));
-  }
+  $arguments = array('radius' => $radius);
+  $operation = OperationBase::create('spread');
 
-  return FALSE;
+  return $operation && $operation->apply($image, $arguments);
 }
 
 /**
@@ -692,11 +677,10 @@ function image_graphicsmagick_toolkit_spread(object $image, float $radius): bool
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function image_graphicsmagick_toolkit_swirl(object $image, float $degrees): bool {
-  if ($operation = OperationBase::create('swirl')) {
-    return $operation->apply($image, array('degrees' => $degrees));
-  }
+  $arguments = array('degrees' => $degrees);
+  $operation = OperationBase::create('swirl');
 
-  return FALSE;
+  return $operation && $operation->apply($image, $arguments);
 }
 
 /**
@@ -710,11 +694,9 @@ function image_graphicsmagick_toolkit_swirl(object $image, float $degrees): bool
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_blur_form(array $data): array {
-  if ($effect = EffectBase::create('blur')) {
-    return $effect->settingsForm($data);
-  }
+  $effect = EffectBase::create('blur');
 
-  return array();
+  return $effect ? $effect->settingsForm($data) : array();
 }
 
 /**
@@ -732,11 +714,9 @@ function graphicsmagick_effects_blur_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_blur(object $image, array $data): bool {
-  if ($effect = EffectBase::create('blur')) {
-    return $effect->apply($image, $data);
-  }
+  $effect = EffectBase::create('blur');
 
-  return FALSE;
+  return $effect && $effect->apply($image, $data);
 }
 
 /**
@@ -749,11 +729,9 @@ function graphicsmagick_effects_blur(object $image, array $data): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_despeckle(object $image): bool {
-  if ($effect = EffectBase::create('despeckle')) {
-    return $effect->apply($image);
-  }
+  $effect = EffectBase::create('despeckle');
 
-  return FALSE;
+  return $effect && $effect->apply($image);
 }
 
 /**
@@ -769,11 +747,9 @@ function graphicsmagick_effects_despeckle(object $image): bool {
  *   - "radius": the operation radius.
  */
 function graphicsmagick_effects_edge_form(array $data): array {
-  if ($effect = EffectBase::create('edge')) {
-    return $effect->settingsForm($data);
-  }
+  $effect = EffectBase::create('edge');
 
-  return array();
+  return $effect ? $effect->settingsForm($data) : array();
 }
 
 /**
@@ -790,10 +766,9 @@ function graphicsmagick_effects_edge_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_edge(object $image, array $data): bool {
-  if ($effect = EffectBase::create('edge')) {
-    return $effect->apply($image, $data);
-  }
-  return FALSE;
+  $effect = EffectBase::create('edge');
+
+  return $effect && $effect->apply($image, $data);
 }
 
 /**
@@ -807,11 +782,9 @@ function graphicsmagick_effects_edge(object $image, array $data): bool {
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_emboss_form(array $data): array {
-  if ($effect = EffectBase::create('emboss')) {
-    return $effect->settingsForm($data);
-  }
+  $effect = EffectBase::create('emboss');
 
-  return array();
+  return $effect ? $effect->settingsForm($data) : array();
 }
 
 /**
@@ -829,11 +802,9 @@ function graphicsmagick_effects_emboss_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_emboss(object $image, array $data): bool {
-  if ($effect = EffectBase::create('emboss')) {
-    return $effect->apply($image, $data);
-  }
+  $effect = EffectBase::create('emboss');
 
-  return FALSE;
+  return $effect && $effect->apply($image, $data);
 }
 
 /**
@@ -849,11 +820,9 @@ function graphicsmagick_effects_emboss(object $image, array $data): bool {
  *   TRUE on success, FALSE on failure to blur the image.
  */
 function graphicsmagick_effects_enhance(object $image, array $data): bool {
-  if ($effect = EffectBase::create('enhance')) {
-    return $effect->apply($image, $data);
-  }
+  $effect = EffectBase::create('enhance');
 
-  return FALSE;
+  return $effect && $effect->apply($image);
 }
 
 /**
@@ -869,11 +838,9 @@ function graphicsmagick_effects_enhance(object $image, array $data): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_equalize(object $image, array $data): bool {
-  if ($effect = EffectBase::create('equalize')) {
-    return $effect->apply($image, $data);
-  }
+  $effect = EffectBase::create('equalize');
 
-  return FALSE;
+  return $effect && $effect->apply($image);
 }
 
 /**
@@ -889,11 +856,9 @@ function graphicsmagick_effects_equalize(object $image, array $data): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_flip(object $image, array $data): bool {
-  if ($effect = EffectBase::create('flip')) {
-    return $effect->apply($image, $data);
-  }
+  $effect = EffectBase::create('flip');
 
-  return FALSE;
+  return $effect && $effect->apply($image);
 }
 
 /**
@@ -909,11 +874,9 @@ function graphicsmagick_effects_flip(object $image, array $data): bool {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_flop(object $image, array $data): bool {
-  if ($effect = EffectBase::create('flop')) {
-    return $effect->apply($image, $data);
-  }
+  $effect = EffectBase::create('flop');
 
-  return FALSE;
+  return $effect && $effect->apply($image);
 }
 
 /**
@@ -927,11 +890,9 @@ function graphicsmagick_effects_flop(object $image, array $data): bool {
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_gamma_form(array $data): array {
-  if ($effect = EffectBase::create('gamma')) {
-    return $effect->settingsForm($data);
-  }
+  $effect = EffectBase::create('gamma');
 
-  return array();
+  return $effect ? $effect->settingsForm($data) : array();
 }
 
 /**
@@ -948,11 +909,9 @@ function graphicsmagick_effects_gamma_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_gamma(object $image, array $data): bool {
-  if ($effect = EffectBase::create('gamma')) {
-    return $effect->apply($image, $data);
-  }
+  $effect = EffectBase::create('gamma');
 
-  return FALSE;
+  return $effect && $effect->apply($image, $data);
 }
 
 /**
@@ -966,11 +925,9 @@ function graphicsmagick_effects_gamma(object $image, array $data): bool {
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_noise_form(array $data): array {
-  if ($effect = EffectBase::create('noise')) {
-    return $effect->settingsForm($data);
-  }
+  $effect = EffectBase::create('noise');
 
-  return array();
+  return $effect ? $effect->settingsForm($data) : array();
 }
 
 /**
@@ -987,11 +944,9 @@ function graphicsmagick_effects_noise_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_noise(object $image, array $data): bool {
-  if ($effect = EffectBase::create('noise')) {
-    return $effect->apply($image, $data);
-  }
+  $effect = EffectBase::create('noise');
 
-  return FALSE;
+  return $effect && $effect->apply($image, $data);
 }
 
 /**
@@ -1005,11 +960,9 @@ function graphicsmagick_effects_noise(object $image, array $data): bool {
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_oil_paint_form(array $data): array {
-  if ($effect = EffectBase::create('oil_paint')) {
-    return $effect->settingsForm($data);
-  }
+  $effect = EffectBase::create('oil_paint');
 
-  return array();
+  return $effect ? $effect->settingsForm($data) : array();
 }
 
 /**
@@ -1027,11 +980,9 @@ function graphicsmagick_effects_oil_paint_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_oil_paint(object $image, array $data): bool {
-  if ($effect = EffectBase::create('oil_paint')) {
-    return $effect->apply($image, $data);
-  }
+  $effect = EffectBase::create('oil_paint');
 
-  return FALSE;
+  return $effect && $effect->apply($image, $data);
 }
 
 /**
@@ -1045,11 +996,9 @@ function graphicsmagick_effects_oil_paint(object $image, array $data): bool {
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_solarize_form(array $data): array {
-  if ($effect = EffectBase::create('solarize')) {
-    return $effect->settingsForm($data);
-  }
+  $effect = EffectBase::create('solarize');
 
-  return array();
+  return $effect ? $effect->settingsForm($data) : array();
 }
 
 /**
@@ -1066,11 +1015,9 @@ function graphicsmagick_effects_solarize_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_solarize(object $image, array $data): bool {
-  if ($effect = EffectBase::create('solarize')) {
-    return $effect->apply($image, $data);
-  }
+  $effect = EffectBase::create('solarize');
 
-  return FALSE;
+  return $effect && $effect->apply($image, $data);
 }
 
 /**
@@ -1084,11 +1031,9 @@ function graphicsmagick_effects_solarize(object $image, array $data): bool {
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_spread_form(array $data): array {
-  if ($effect = EffectBase::create('spread')) {
-    return $effect->settingsForm($data);
-  }
+  $effect = EffectBase::create('spread');
 
-  return array();
+  return $effect ? $effect->settingsForm($data) : array();
 }
 
 /**
@@ -1106,11 +1051,9 @@ function graphicsmagick_effects_spread_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_spread(object $image, array $data): bool {
-  if ($effect = EffectBase::create('spread')) {
-    return $effect->apply($image, $data);
-  }
+  $effect = EffectBase::create('spread');
 
-  return FALSE;
+  return $effect && $effect->apply($image, $data);
 }
 
 /**
@@ -1124,11 +1067,9 @@ function graphicsmagick_effects_spread(object $image, array $data): bool {
  *   The current configuration for this effect.
  */
 function graphicsmagick_effects_swirl_form(array $data): array {
-  if ($effect = EffectBase::create('swirl')) {
-    return $effect->settingsForm($data);
-  }
+  $effect = EffectBase::create('swirl');
 
-  return array();
+  return $effect ? $effect->settingsForm($data) : array();
 }
 
 /**
@@ -1145,11 +1086,9 @@ function graphicsmagick_effects_swirl_form(array $data): array {
  *   TRUE on success, FALSE on failure to apply the effect.
  */
 function graphicsmagick_effects_swirl(object $image, array $data): bool {
-  if ($effect = EffectBase::create('swirl')) {
-    return $effect->apply($image, $data);
-  }
+  $effect = EffectBase::create('swirl');
 
-  return FALSE;
+  return $effect && $effect->apply($image, $data);
 }
 
 /**

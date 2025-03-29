@@ -156,8 +156,8 @@ class ImageHandler {
   /**
    * Retrieves the format of the current image.
    *
-   * This method returns the format of the image as a string. If an error
-   * occurs while attempting to retrieve the format, an empty string is returned.
+   * This method returns the format of the image as a string. If an error occurs
+   * while attempting to retrieve the format, an empty string is returned.
    *
    * @return string
    *   The format of the image, or an empty string on failure.

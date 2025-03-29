@@ -35,7 +35,7 @@ class ToolkitSettings implements ToolkitSettingsInterface {
     foreach ($attributes as $attribute) {
       $instance = $attribute->newInstance();
       $this->defaultSettings[$instance->id] = $instance->value;
-      $this->settings[$instance->id] = $config->get($instance->id);
+      $this->settings[$instance->id] = $config->get($instance->id) ?? $instance->value;
     }
   }
 
