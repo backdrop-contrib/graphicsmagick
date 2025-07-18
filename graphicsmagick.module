@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 /**
  * Implements hook_autoload_info().
+ *
+ * @hook
  */
 function graphicsmagick_autoload_info(): array {
   return array(
@@ -63,6 +65,8 @@ function graphicsmagick_autoload_info(): array {
 
 /**
  * Implements hook_image_effect_info().
+ *
+ * @hook
  */
 function graphicsmagick_image_effect_info(): array {
   $effects = array();
@@ -185,6 +189,8 @@ function graphicsmagick_image_effect_info(): array {
 
  /**
  * Implements hook_image_toolkits().
+  *
+  * @hook
  */
 function graphicsmagick_image_toolkits(): array {
   try {
@@ -211,6 +217,8 @@ function graphicsmagick_image_toolkits(): array {
 
 /**
  * Implements hook_theme().
+ *
+ * @hook
  */
 function graphicsmagick_theme(): array {
   $summary_base = array(
@@ -236,6 +244,8 @@ function graphicsmagick_theme(): array {
  *
  * @return array
  *   The form array.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_settings(): array {
   return (new ToolkitSettings())->settingsForm();
@@ -246,6 +256,8 @@ function image_graphicsmagick_toolkit_settings(): array {
  *
  * @return array
  *   The supported extensions.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_supported_extensions(): array {
   try {
@@ -270,6 +282,8 @@ function image_graphicsmagick_toolkit_supported_extensions(): array {
  *
  * @see image_load()
  * @see graphicsmagick_image_load()
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_load(object $image): bool {
   return graphicsmagick_image_load($image);
@@ -288,6 +302,8 @@ function image_graphicsmagick_toolkit_load(object $image): bool {
  *
  * @see image_save()
  * @see graphicsmagick_image_save()
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_save(object $image, string $destination): bool {
   return graphicsmagick_image_save($image, $destination);
@@ -306,6 +322,8 @@ function image_graphicsmagick_toolkit_save(object $image, string $destination): 
  *   - "height": Height, in pixels.
  *
  * @see image_get_info()
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_get_info(object $image): false|array {
   try {
@@ -342,6 +360,8 @@ function image_graphicsmagick_toolkit_get_info(object $image): false|array {
  *   TRUE or FALSE, based on success.
  *
  * @see image_resize()
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_resize(object $image, int $width, int $height): bool {
   $operation = OperationBase::create('resize');
@@ -363,12 +383,14 @@ function image_graphicsmagick_toolkit_resize(object $image, int $width, int $hei
  * @param int|string|null $background
  *   A hexadecimal value specifying the background color to use for the
  *   uncovered area of the image after the rotation, for example 0x000000 for
- *   black or 0xff00ff for magenta. The default value is #FFFFFF.
+ *   black or 0xff00ff for magenta. The default background color is white.
  *
  * @return bool
  *   TRUE or FALSE, based on success.
  *
  * @see image_rotate()
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_rotate(object $image, int $degrees, int|string|null $background): bool {
   try {
@@ -407,6 +429,8 @@ function image_graphicsmagick_toolkit_rotate(object $image, int $degrees, int|st
  *   TRUE or FALSE, based on success.
  *
  * @see image_crop()
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_crop(object $image, int $x, int $y, int $width, int $height): bool {
   $arguments = array(
@@ -430,6 +454,8 @@ function image_graphicsmagick_toolkit_crop(object $image, int $x, int $y, int $w
  *   TRUE or FALSE, based on success.
  *
  * @see image_desaturate()
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_desaturate(object $image): bool {
   $operation = OperationBase::create('desaturate');
@@ -449,6 +475,8 @@ function image_graphicsmagick_toolkit_desaturate(object $image): bool {
  *
  * @return bool
  *   TRUE or FALSE, based on success.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_blur(object $image, float $radius, float $sigma): bool {
   $arguments = array(
@@ -468,6 +496,8 @@ function image_graphicsmagick_toolkit_blur(object $image, float $radius, float $
  *
  * @return bool
  *   TRUE or FALSE, based on success.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_despeckle(object $image): bool {
   $operation = OperationBase::create('despeckle');
@@ -485,6 +515,8 @@ function image_graphicsmagick_toolkit_despeckle(object $image): bool {
  *
  * @return bool
  *   TRUE or FALSE, based on success.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_edge(object $image, float $radius): bool {
   $arguments = array('radius' => $radius);
@@ -505,6 +537,8 @@ function image_graphicsmagick_toolkit_edge(object $image, float $radius): bool {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_emboss(object $image, float $radius, float $sigma): bool {
   $arguments = array('radius' => $radius, 'sigma' => $sigma);
@@ -521,6 +555,8 @@ function image_graphicsmagick_toolkit_emboss(object $image, float $radius, float
  *
  * @return bool
  *   TRUE on success, FALSE on failure to blur the image.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_enhance(object $image): bool {
   $operation = OperationBase::create('enhance');
@@ -536,6 +572,8 @@ function image_graphicsmagick_toolkit_enhance(object $image): bool {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_equalize(object $image): bool {
   $operation = OperationBase::create('equalize');
@@ -551,6 +589,8 @@ function image_graphicsmagick_toolkit_equalize(object $image): bool {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_flip(object $image): bool {
   $operation = OperationBase::create('flip');
@@ -566,6 +606,8 @@ function image_graphicsmagick_toolkit_flip(object $image): bool {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_flop(object $image): bool {
   $operation = OperationBase::create('flop');
@@ -583,6 +625,8 @@ function image_graphicsmagick_toolkit_flop(object $image): bool {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_gamma(object $image, float $gamma): bool {
   $arguments = array('gamma' => $gamma);
@@ -601,6 +645,8 @@ function image_graphicsmagick_toolkit_gamma(object $image, float $gamma): bool {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_noise(object $image, int $noise): bool {
   $arguments = array('noise' => $noise);
@@ -620,6 +666,8 @@ function image_graphicsmagick_toolkit_noise(object $image, int $noise): bool {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_oil_paint(object $image, float $radius): bool {
   $arguments = array('radius' => $radius);
@@ -638,6 +686,8 @@ function image_graphicsmagick_toolkit_oil_paint(object $image, float $radius): b
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_solarize(object $image, int $level): bool {
   $arguments = array('level' => $level);
@@ -657,6 +707,8 @@ function image_graphicsmagick_toolkit_solarize(object $image, int $level): bool 
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_spread(object $image, float $radius): bool {
   $arguments = array('radius' => $radius);
@@ -675,6 +727,8 @@ function image_graphicsmagick_toolkit_spread(object $image, float $radius): bool
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function image_graphicsmagick_toolkit_swirl(object $image, float $degrees): bool {
   $arguments = array('degrees' => $degrees);
@@ -692,6 +746,8 @@ function image_graphicsmagick_toolkit_swirl(object $image, float $degrees): bool
  *
  * @param array $data
  *   The current configuration for this effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_blur_form(array $data): array {
   $effect = EffectBase::create('blur');
@@ -712,6 +768,8 @@ function graphicsmagick_effects_blur_form(array $data): array {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_blur(object $image, array $data): bool {
   $effect = EffectBase::create('blur');
@@ -727,6 +785,8 @@ function graphicsmagick_effects_blur(object $image, array $data): bool {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_despeckle(object $image): bool {
   $effect = EffectBase::create('despeckle');
@@ -745,6 +805,8 @@ function graphicsmagick_effects_despeckle(object $image): bool {
  *   An array of attributes to use when performing the effect with the
  *   following items:
  *   - "radius": the operation radius.
+ *
+ * @hook
  */
 function graphicsmagick_effects_edge_form(array $data): array {
   $effect = EffectBase::create('edge');
@@ -764,6 +826,8 @@ function graphicsmagick_effects_edge_form(array $data): array {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_edge(object $image, array $data): bool {
   $effect = EffectBase::create('edge');
@@ -780,6 +844,8 @@ function graphicsmagick_effects_edge(object $image, array $data): bool {
  *
  * @param array $data
  *   The current configuration for this effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_emboss_form(array $data): array {
   $effect = EffectBase::create('emboss');
@@ -800,6 +866,8 @@ function graphicsmagick_effects_emboss_form(array $data): array {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_emboss(object $image, array $data): bool {
   $effect = EffectBase::create('emboss');
@@ -818,6 +886,8 @@ function graphicsmagick_effects_emboss(object $image, array $data): bool {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to blur the image.
+ *
+ * @hook
  */
 function graphicsmagick_effects_enhance(object $image, array $data): bool {
   $effect = EffectBase::create('enhance');
@@ -836,6 +906,8 @@ function graphicsmagick_effects_enhance(object $image, array $data): bool {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_equalize(object $image, array $data): bool {
   $effect = EffectBase::create('equalize');
@@ -854,6 +926,8 @@ function graphicsmagick_effects_equalize(object $image, array $data): bool {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_flip(object $image, array $data): bool {
   $effect = EffectBase::create('flip');
@@ -872,6 +946,8 @@ function graphicsmagick_effects_flip(object $image, array $data): bool {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_flop(object $image, array $data): bool {
   $effect = EffectBase::create('flop');
@@ -888,6 +964,8 @@ function graphicsmagick_effects_flop(object $image, array $data): bool {
  *
  * @param array $data
  *   The current configuration for this effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_gamma_form(array $data): array {
   $effect = EffectBase::create('gamma');
@@ -907,6 +985,8 @@ function graphicsmagick_effects_gamma_form(array $data): array {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_gamma(object $image, array $data): bool {
   $effect = EffectBase::create('gamma');
@@ -923,6 +1003,8 @@ function graphicsmagick_effects_gamma(object $image, array $data): bool {
  *
  * @param array $data
  *   The current configuration for this effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_noise_form(array $data): array {
   $effect = EffectBase::create('noise');
@@ -942,6 +1024,8 @@ function graphicsmagick_effects_noise_form(array $data): array {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_noise(object $image, array $data): bool {
   $effect = EffectBase::create('noise');
@@ -958,6 +1042,8 @@ function graphicsmagick_effects_noise(object $image, array $data): bool {
  *
  * @param array $data
  *   The current configuration for this effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_oil_paint_form(array $data): array {
   $effect = EffectBase::create('oil_paint');
@@ -978,6 +1064,8 @@ function graphicsmagick_effects_oil_paint_form(array $data): array {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_oil_paint(object $image, array $data): bool {
   $effect = EffectBase::create('oil_paint');
@@ -994,6 +1082,8 @@ function graphicsmagick_effects_oil_paint(object $image, array $data): bool {
  *
  * @param array $data
  *   The current configuration for this effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_solarize_form(array $data): array {
   $effect = EffectBase::create('solarize');
@@ -1013,6 +1103,8 @@ function graphicsmagick_effects_solarize_form(array $data): array {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_solarize(object $image, array $data): bool {
   $effect = EffectBase::create('solarize');
@@ -1029,6 +1121,8 @@ function graphicsmagick_effects_solarize(object $image, array $data): bool {
  *
  * @param array $data
  *   The current configuration for this effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_spread_form(array $data): array {
   $effect = EffectBase::create('spread');
@@ -1049,6 +1143,8 @@ function graphicsmagick_effects_spread_form(array $data): array {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_spread(object $image, array $data): bool {
   $effect = EffectBase::create('spread');
@@ -1065,6 +1161,8 @@ function graphicsmagick_effects_spread(object $image, array $data): bool {
  *
  * @param array $data
  *   The current configuration for this effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_swirl_form(array $data): array {
   $effect = EffectBase::create('swirl');
@@ -1084,6 +1182,8 @@ function graphicsmagick_effects_swirl_form(array $data): array {
  *
  * @return bool
  *   TRUE on success, FALSE on failure to apply the effect.
+ *
+ * @hook
  */
 function graphicsmagick_effects_swirl(object $image, array $data): bool {
   $effect = EffectBase::create('swirl');

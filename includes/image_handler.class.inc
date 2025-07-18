@@ -12,33 +12,16 @@ class ImageHandler {
   protected ?Gmagick $gmagick = NULL;
 
   /**
-   * Retrieves the absolute local file path.
-   *
-   * @param string $filename
-   *   The file path.
-   *
-   * @return string
-   *   The absolute file path.
-   *
-   * @throws FileException
-   *   The local filepath cannot be determined.
-   */
-  protected static function getRealPath(string $filename): string {
-    if (($realpath = backdrop_realpath($filename)) === FALSE) {
-      throw new FileException("The absolute local filepath for $filename cannot be determined.");
-    }
-
-    return $realpath;
-  }
-
-  /**
    * Gets the absolute local path.
    *
    * @param string $source
    *   The file for which the absolute local path is requested.
    *
    * @return string
-   *   The absolute local path, if the file is local, or an empty string.
+   *   The absolute local path, if the file is local.
+   *
+   * @throws FileException
+   *   The file is not local or the local path could not be retrieved.
    */
   protected static function localFile(string $source): string {
     $scheme = file_uri_scheme($source);
@@ -46,19 +29,44 @@ class ImageHandler {
     if ($scheme && file_stream_wrapper_valid_scheme($scheme)) {
       $local_stream_wrappers = file_get_stream_wrappers(STREAM_WRAPPERS_LOCAL);
 
-      if (isset($local_stream_wrappers[$scheme])) {
-        return self::getRealPath($source);
+      if (!isset($local_stream_wrappers[$scheme])) {
+        throw new FileException("$source is not a local file.");
       }
-    }
 
-    return '';
+      $class = file_stream_wrapper_get_class($scheme);
+
+      if (!class_exists($class)) {
+        throw new FileException("Cannot retrieve the local path for $source.");
+      }
+
+      /* @var BackdropStreamWrapperInterface $instance */
+      $instance = new $class();
+      $instance->setUri($source);
+
+      return $instance->realpath();
+    }
+    else {
+      throw new FileException("Cannot retrieve the local path for $source.");
+    }
   }
 
   /**
-   * Copies the file in a temporary local file.
+   * Copies a file from source to destination.
    *
    * @param string $source
-   *   The file to copy.
+   *   The source file to copy from.
+   * @param string $destination
+   *   The destination file to copy to.
+   */
+  protected static function copyFile(string $source, string $destination): void {
+    if (!@file_exists($source)) {
+      throw new FileReadException("The source file $source does not exist.");
+    }
+
+  }
+
+  /**
+   * Creates a temporary file that can be used for image processing.
    *
    * @return string
    *   The absolute filepath of the temporary file.
@@ -66,20 +74,19 @@ class ImageHandler {
    * @throws FileWriteException
    *   The temporary file could not be created.
    */
-  protected static function copyToTemporary(string $source): string {
+  protected static function createTemporary(): string {
     if (($destination = backdrop_tempnam('temporary://', 'graphicsmagick_')) === FALSE) {
       throw new FileWriteException("The temporary file could not be created.");
     }
 
-    // Copy the remote file to the temporary local file.
-    return file_unmanaged_copy($source, $destination, FILE_EXISTS_REPLACE);
+    return $destination;
   }
 
   /**
    * Creates the image handler.
    *
    * @param object $image
-   *   An image object. The $image->handler value will be set by this call.
+   *   An image object. This call will set the $image->handler value.
    *
    * @return $this|null
    *   The image handler or NULL if the image could not be loaded.
@@ -101,8 +108,12 @@ class ImageHandler {
       }
 
       try {
-        if (!$file = self::localFile($image->source)) {
-          $file = self::copyToTemporary($image->source);
+        try {
+          $file = self::localFile($image->source);
+        }
+        catch (FileException) {
+          $file = self::createTemporary();
+          self::copyFile($image->source, $file);
         }
 
         $handler = new static($file);
@@ -213,7 +224,8 @@ class ImageHandler {
    * once for each frame in the Gmagick instance.
    *
    * @param \Closure $callback
-   *   A callback that will be called with the Gmagick instance and the settings.
+   *   A callback that will be called with the Gmagick instance and the
+   *   settings.
    * @param string $operation_type
    *   The operation type, either "single_frame" or "multiple_frames".
    * @param ?array $arguments
@@ -227,7 +239,6 @@ class ImageHandler {
 
     try {
       if (!method_exists($gmagick, 'getNumberImages') || !method_exists($gmagick, 'coalesceImages')) {
-        // The required methods are not implemented by Gmagick. Return FALSE.
         return FALSE;
       }
 
@@ -290,12 +301,12 @@ class ImageHandler {
         $all_frames = FALSE;
       }
 
-      if (!$local_destination = self::localFile($destination)) {
-        $permanent_destination = $destination;
-        $destination = self::copyToTemporary($destination);
+      try {
+        $destination = self::localFile($destination);
       }
-      else {
-        $destination = $local_destination;
+      catch (FileException) {
+        $permanent_destination = $destination;
+        $destination = self::createTemporary();
       }
 
       $this->gmagick->writeImage($destination, $all_frames);
