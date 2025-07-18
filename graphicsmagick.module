@@ -286,7 +286,33 @@ function image_graphicsmagick_toolkit_supported_extensions(): array {
  * @hook
  */
 function image_graphicsmagick_toolkit_load(object $image): bool {
-  return graphicsmagick_image_load($image);
+  if (isset($image->handler) && !is_a($image->handler, ImageHandler::class)) {
+    // $image->handler has been already set, but it is not the expected
+    // instance. To avoid conflicts with other modules, avoid to load the image.
+    return FALSE;
+  }
+  elseif (isset($image->handler)) {
+    $image->handler = NULL;
+  }
+
+  try {
+    $handler = ImageHandler::create($image);
+
+    if (!$handler) {
+      return FALSE;
+    }
+
+    $image->format = $handler->imageFormat();
+    $toolkit_info = new ToolkitInfo();
+    $image->mimeType = $toolkit_info->mimeTypeFromFormat($image->format);
+  }
+  catch (RuntimeException $e) {
+    watchdog_exception('graphicsmagick', $e);
+
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
 /**
@@ -301,12 +327,34 @@ function image_graphicsmagick_toolkit_load(object $image): bool {
  *   TRUE or FALSE, based on success.
  *
  * @see image_save()
- * @see graphicsmagick_image_save()
  *
  * @hook
  */
 function image_graphicsmagick_toolkit_save(object $image, string $destination): bool {
-  return graphicsmagick_image_save($image, $destination);
+  $settings = new ToolkitSettings();
+
+  if (isset($image->handler) && !is_a($image->handler, ImageHandler::class)) {
+    // $image->handler has been already set, but it is not the expected
+    // instance. To avoid conflicts with other modules, avoid to save the image
+    // and return FALSE.
+    return FALSE;
+  }
+
+  if (!isset($image->handler)) {
+    return FALSE;
+  }
+
+  switch ($image->mimeType) {
+    case 'image/jpeg':
+      $image->handler->compressionQuality($settings->get('graphicsmagick_toolkit_jpeg_quality'));
+      break;
+
+    case 'image/png';
+      $image->handler->compressionQuality($settings->get('graphicsmagick_toolkit_png_quality'));
+      break;
+  }
+
+  return $image->handler->save($destination);
 }
 
 /**
@@ -339,6 +387,7 @@ function image_graphicsmagick_toolkit_get_info(object $image): false|array {
     return FALSE;
   }
   finally {
+    // Unset the handler set by ImageHandler::create().
     $image->handler = NULL;
   }
 
@@ -383,7 +432,7 @@ function image_graphicsmagick_toolkit_resize(object $image, int $width, int $hei
  * @param int|string|null $background
  *   A hexadecimal value specifying the background color to use for the
  *   uncovered area of the image after the rotation, for example 0x000000 for
- *   black or 0xff00ff for magenta. The default background color is white.
+ *   black or 0xff00ff for magenta. The default background color is transparent.
  *
  * @return bool
  *   TRUE or FALSE, based on success.
@@ -1189,96 +1238,4 @@ function graphicsmagick_effects_swirl(object $image, array $data): bool {
   $effect = EffectBase::create('swirl');
 
   return $effect && $effect->apply($image, $data);
-}
-
-/**
- * Loads an image from a file.
- *
- * This function can be used from any module that needs to use the effects
- * implemented by the GraphicsMagick Effects modules independently of the
- * toolkit set for the site. In the case the used toolkit is not
- * GraphicsMagick Toolkit, this function could cause the image to be loaded
- * again, with the consequence that the image data is loaded twice in memory.
- *
- * $image->source is expected to contain the source file path. If it has not
- * been set, or it does not contain the expected value, this function will
- * return FALSE.
- *
- * @param object $image
- *   An image object. The $image->handler, and $image->format, and
- *   $image->mimeType values will be populated by this call.
- *
- * @return bool
- *   TRUE or FALSE, based on success.
- */
-function graphicsmagick_image_load(object $image): bool {
-  if (isset($image->handler) && !is_a($image->handler, ImageHandler::class)) {
-    // $image->handler has been already set, but it is not the expected
-    // instance. To avoid conflicts with other modules, avoid to load the image.
-    return FALSE;
-  }
-  elseif (isset($image->handler)) {
-    $image->handler = NULL;
-  }
-
-  try {
-    $handler = ImageHandler::create($image);
-
-    if (!$handler) {
-      return FALSE;
-    }
-
-    $image->format = $handler->imageFormat();
-    $toolkit_info = new ToolkitInfo();
-    $image->mimeType = $toolkit_info->mimeTypeFromFormat($image->format);
-  }
-  catch (RuntimeException $e) {
-    watchdog_exception('graphicsmagick', $e);
-
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
-/**
- * Writes an image to a destination file.
- *
- * @param object $image
- *   An image object. $image->handler must be a Gmagick instance; the image will
- *   be saved and the $image->handler value will be changed by this call.
- * @param string $destination
- *   A URI or file path where the image should be saved.
- *
- * @return bool
- *   TRUE or FALSE, based on success.
- *   The returned value will be FALSE even in the case the $image->handler value
- *   has been set, but it is not a Gmagick instance, or the $image->handler
- *   value has not been set, and it is not possible to load the source image.
- */
-function graphicsmagick_image_save(object $image, string $destination): bool {
-  $settings = new ToolkitSettings();
-
-  if (isset($image->handler) && !is_a($image->handler, ImageHandler::class)) {
-    // $image->handler has been already set, but it is not the expected
-    // instance. To avoid conflicts with other modules, avoid to save the image
-    // and return FALSE.
-    return FALSE;
-  }
-
-  if (!isset($image->handler)) {
-    return FALSE;
-  }
-
-  switch ($image->mimeType) {
-    case 'image/jpeg':
-      $image->handler->compressionQuality($settings->get('graphicsmagick_toolkit_jpeg_quality'));
-      break;
-
-    case 'image/png';
-      $image->handler->compressionQuality($settings->get('graphicsmagick_toolkit_png_quality'));
-      break;
-  }
-
-  return $image->handler->save($destination);
 }
