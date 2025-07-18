@@ -7,25 +7,9 @@
 declare(strict_types=1);
 
 /**
- * Clears the image effect definitions cache.
- *
- * This function is used to reset the static cache and delete cached image
- * effect definitions when necessary. It ensures that cache clearing is
- * performed only once per request to avoid redundant operations.
- */
-function _graphicsmagick_clear_image_effect_definitions(): void {
-  static $already_called = FALSE;
-
-  if (!$already_called) {
-    $already_called = TRUE;
-
-    backdrop_static_reset('image_effect_definitions');
-    cache()->deletePrefix('image_effect_definitions:');
-  }
-}
-
-/**
  * Implements hook_requirements().
+ *
+ * @hook
  */
 function graphicsmagick_requirements($phase): array {
   $requirements = array();
@@ -57,29 +41,32 @@ function graphicsmagick_requirements($phase): array {
     }
 
     try {
-      $handler = new Gmagick();
+      $toolkit_info = new ToolkitInfo();
 
-      // Verify the undocumented methods used by the toolkit are implemented.
-      $missing_methods = FALSE;
-      $missing_methods |= !method_exists($handler, 'getNumberImages');
-      $missing_methods |= !method_exists($handler, 'coalesceImages');
-      $missing_methods |= !method_exists($handler, 'deconstructImages');
-
-      if ($missing_methods) {
-        $requirements['graphicsmagick_extension']['severity'] = REQUIREMENT_ERROR;
-        $requirements['graphicsmagick_extension']['description'] = $t(
-          'The <a href="@gmagick_link">Gmagick</a> extension has been loaded, but the <code>Gmagick</code> class it implements does not have the methods necessary to the gmagick toolkit.',
+      if ($toolkit_info->isAvailable()) {
+        $requirements['graphicsmagick_toolkit']['severity'] = REQUIREMENT_ERROR;
+        $requirements['graphicsmagick_toolkit']['value'] = $t('The GraphicsMagick toolkit is available.');
+        $requirements['graphicsmagick_toolkit']['description'] = $t(
+          'The <a href="@gmagick_link">Gmagick</a> extension has been loaded and can be used with the GraphicsMagick toolkit.',
           ['@gmagick_link' => 'https://www.php.net/manual/en/book.gmagick.php']
         );
+
+        return $requirements;
       }
     }
-    catch (GmagickException|Error) {
-      $requirements['graphicsmagick_extension']['severity'] = REQUIREMENT_ERROR;
-      $requirements['graphicsmagick_extension']['description'] = $t(
+    catch (RuntimeException $e) {
+      watchdog_exception('graphicsmagick', $e);
+
+      $requirements['graphicsmagick_toolkit']['severity'] = REQUIREMENT_ERROR;
+      $requirements['graphicsmagick_toolkit']['value'] = $t('Version: unknown');
+      $requirements['graphicsmagick_toolkit']['description'] = $t(
         'The <a href="@gmagick_link">Gmagick</a> extension has been loaded, but there has been an error when using the class it implements.',
         ['@gmagick_link' => 'https://www.php.net/manual/en/book.gmagick.php']
       );
+
+      return $requirements;
     }
+
   }
   else {
     if (!extension_loaded('gmagick')) {
@@ -114,7 +101,7 @@ function graphicsmagick_requirements($phase): array {
     $requirements['graphicsmagick_effects']['severity'] = REQUIREMENT_WARNING;
     $requirements['graphicsmagick_effects']['value'] = $t('Installed');
     $requirements['graphicsmagick_effects']['description'] = $t(
-      'The contributed <em>GraphicsMagick Effects</em> module located at %path is no longer necessary, since its functionality is now provided by the <em>GraphicsMagick</em> module. It is recommended to !operation the <em>GraphicsMagick Effects</em> module from your site.',
+      'The <em>GraphicsMagick Effects</em> module located at %path is no longer necessary, since its functionality is now provided by the <em>GraphicsMagick</em> module. It is recommended to !operation the <em>GraphicsMagick Effects</em> module from your site.',
       array('!operation' => t('uninstall'), '%path' => BACKDROP_ROOT . "/$path")
     );
   }
@@ -124,6 +111,8 @@ function graphicsmagick_requirements($phase): array {
 
 /**
  * Uninstall the GraphicsMagick Effects module.
+ *
+ * @hook
  */
 function graphicsmagick_update_1101(): void {
   if (module_exists('graphicsmagick_effects')) {
@@ -142,16 +131,22 @@ function graphicsmagick_update_1101(): void {
 
 /**
  * Clear the image effect definitions cache.
+ *
+ * @hook
  */
 function graphicsmagick_update_1102(): void {
-  _graphicsmagick_clear_image_effect_definitions();
+  // This hook is intentionally left blank. The code has been moved to the
+  // next hook, graphicsmagick_update_1103().
 }
 
 /**
  * Clear the image effect definitions cache.
+ *
+ * @hook
  */
 function graphicsmagick_update_1103(): void {
-  _graphicsmagick_clear_image_effect_definitions();
+  backdrop_static_reset('image_effect_definitions');
+  cache()->deletePrefix('image_effect_definitions:');
 }
 
 

@@ -144,7 +144,7 @@ class ToolkitInfo implements ToolkitInfoInterface {
     if (isset($this->gmagick)) {
       try {
         $quantum_level = $this->gmagick->getQuantumDepth()['quantumDepthLong'] ?? 8;
-      } catch (GmagickException $e) {
+      } catch (GmagickException) {
         // As getting the quantum depth failed, assume it is 8.
       }
     }
